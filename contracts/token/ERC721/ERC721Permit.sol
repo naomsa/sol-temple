@@ -46,7 +46,7 @@ abstract contract ERC721Permit is IERC721Permit, ERC721 {
   /*               \___/'           */
 
   /// @notice Upgradable pattern constructor.
-  function __ERC721Permit_init(string calldata name_, string calldata version_)
+  function __ERC721Permit_init(string memory name_, string memory version_)
     internal
   {
     _DOMAIN_SEPARATOR = _hashDomain(
