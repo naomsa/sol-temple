@@ -1,10 +1,10 @@
 {
   "name": "@onigiridao/library",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "main": "index.js",
   "license": "MIT",
   "files": [
-    "**/*.sol"
+    "contracts/**/*.sol"
   ],
   "scripts": {
     "test": "cross-env TS_NODE_TRANSPILE_ONLY=1 hardhat test",
