@@ -1,10 +1,10 @@
 {
-  "name": "@onigiridao/onigiri-kitchen",
-  "version": "1.0.0",
+  "name": "@onigiridao/library",
+  "version": "1.0.1",
   "main": "index.js",
   "license": "MIT",
   "files": [
-    "contracts/"
+    "**/*.sol"
   ],
   "scripts": {
     "test": "cross-env TS_NODE_TRANSPILE_ONLY=1 hardhat test",
