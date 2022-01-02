@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: GPL-3.0-or-later
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/token/ERC1155/IERC1155.sol";
@@ -23,11 +23,11 @@ abstract contract ERC1155 is ERC165, IERC1155, IERC1155MetadataURI {
   /*  \__, \| |_ ( (_| || |_ (  ___/  */
   /*  (____/`\__)`\__,_)`\__)`\____)  */
 
-  /// @notice Mapping from token ID to account balances
-  mapping(uint256 => mapping(address => uint256)) private _balances;
+  /// @notice See {IERC1155-balanceOf}.
+  mapping(address => mapping(uint256 => uint256)) public balanceOf;
 
-  /// @notice Mapping from account to operator approvals
-  mapping(address => mapping(address => bool)) private _operatorApprovals;
+  /// @notice See {IERC1155-isApprovedForAll}.
+  mapping(address => mapping(address => bool)) public isApprovedForAll;
 
   /**
    * @notice Used as the URI for all token types by relying on ID substitution,
@@ -59,26 +59,6 @@ abstract contract ERC1155 is ERC165, IERC1155, IERC1155MetadataURI {
   }
 
   /**
-   * @notice See {IERC1155-balanceOf}.
-   *
-   * Requirements:
-   * - `account` cannot be the zero address.
-   */
-  function balanceOf(address account, uint256 id)
-    public
-    view
-    virtual
-    override
-    returns (uint256)
-  {
-    require(
-      account != address(0),
-      "ERC1155::balanceOf: balance query for the zero address"
-    );
-    return _balances[id][account];
-  }
-
-  /**
    * @notice See {IERC1155-balanceOfBatch}.
    *
    * Requirements:
@@ -99,7 +79,7 @@ abstract contract ERC1155 is ERC165, IERC1155, IERC1155MetadataURI {
     uint256[] memory batchBalances = new uint256[](accounts.length);
 
     for (uint256 i = 0; i < accounts.length; ++i) {
-      batchBalances[i] = balanceOf(accounts[i], ids[i]);
+      batchBalances[i] = balanceOf[accounts[i]][ids[i]];
     }
 
     return batchBalances;
@@ -117,19 +97,6 @@ abstract contract ERC1155 is ERC165, IERC1155, IERC1155MetadataURI {
   }
 
   /**
-   * @notice See {IERC1155-isApprovedForAll}.
-   */
-  function isApprovedForAll(address account, address operator)
-    public
-    view
-    virtual
-    override
-    returns (bool)
-  {
-    return _operatorApprovals[account][operator];
-  }
-
-  /**
    * @notice See {IERC1155-safeTransferFrom}.
    */
   function safeTransferFrom(
@@ -140,7 +107,7 @@ abstract contract ERC1155 is ERC165, IERC1155, IERC1155MetadataURI {
     bytes memory data
   ) public virtual override {
     require(
-      from == msg.sender || isApprovedForAll(from, msg.sender),
+      from == msg.sender || isApprovedForAll[from][msg.sender],
       "ERC1155::safeTransferFrom: caller is not owner nor approved"
     );
     _safeTransferFrom(from, to, id, amount, data);
@@ -157,7 +124,7 @@ abstract contract ERC1155 is ERC165, IERC1155, IERC1155MetadataURI {
     bytes memory data
   ) public virtual override {
     require(
-      from == msg.sender || isApprovedForAll(from, msg.sender),
+      from == msg.sender || isApprovedForAll[from][msg.sender],
       "ERC1155::safeBatchTransferFrom: transfer caller is not owner nor approved"
     );
     _safeBatchTransferFrom(from, to, ids, amounts, data);
@@ -203,15 +170,15 @@ abstract contract ERC1155 is ERC165, IERC1155, IERC1155MetadataURI {
       data
     );
 
-    uint256 fromBalance = _balances[id][from];
+    uint256 fromBalance = balanceOf[from][id];
     require(
       fromBalance >= amount,
       "ERC1155::_safeTransferFrom: insufficient balance for transfer"
     );
     unchecked {
-      _balances[id][from] = fromBalance - amount;
+      balanceOf[from][id] = fromBalance - amount;
     }
-    _balances[id][to] += amount;
+    balanceOf[to][id] += amount;
 
     emit TransferSingle(operator, from, to, id, amount);
 
@@ -247,15 +214,15 @@ abstract contract ERC1155 is ERC165, IERC1155, IERC1155MetadataURI {
       uint256 id = ids[i];
       uint256 amount = amounts[i];
 
-      uint256 fromBalance = _balances[id][from];
+      uint256 fromBalance = balanceOf[from][id];
       require(
         fromBalance >= amount,
         "ERC1155::_safeBatchTransferFrom: insufficient balance for transfer"
       );
       unchecked {
-        _balances[id][from] = fromBalance - amount;
+        balanceOf[from][id] = fromBalance - amount;
       }
-      _balances[id][to] += amount;
+      balanceOf[to][id] += amount;
     }
 
     emit TransferBatch(operator, from, to, ids, amounts);
@@ -303,7 +270,7 @@ abstract contract ERC1155 is ERC165, IERC1155, IERC1155MetadataURI {
       data
     );
 
-    _balances[id][to] += amount;
+    balanceOf[to][id] += amount;
     emit TransferSingle(operator, address(0), to, id, amount);
 
     _doSafeTransferAcceptanceCheck(operator, address(0), to, id, amount, data);
@@ -334,7 +301,7 @@ abstract contract ERC1155 is ERC165, IERC1155, IERC1155MetadataURI {
     _beforeTokenTransfer(operator, address(0), to, ids, amounts, data);
 
     for (uint256 i = 0; i < ids.length; i++) {
-      _balances[ids[i]][to] += amounts[i];
+      balanceOf[to][ids[i]] += amounts[i];
     }
 
     emit TransferBatch(operator, address(0), to, ids, amounts);
@@ -374,13 +341,13 @@ abstract contract ERC1155 is ERC165, IERC1155, IERC1155MetadataURI {
       ""
     );
 
-    uint256 fromBalance = _balances[id][from];
+    uint256 fromBalance = balanceOf[from][id];
     require(
       fromBalance >= amount,
       "ERC1155::_burn: burn amount exceeds balance"
     );
     unchecked {
-      _balances[id][from] = fromBalance - amount;
+      balanceOf[from][id] = fromBalance - amount;
     }
 
     emit TransferSingle(operator, from, address(0), id, amount);
@@ -414,13 +381,13 @@ abstract contract ERC1155 is ERC165, IERC1155, IERC1155MetadataURI {
       uint256 id = ids[i];
       uint256 amount = amounts[i];
 
-      uint256 fromBalance = _balances[id][from];
+      uint256 fromBalance = balanceOf[from][id];
       require(
         fromBalance >= amount,
         "ERC1155::_burnBatch: burn amount exceeds balance"
       );
       unchecked {
-        _balances[id][from] = fromBalance - amount;
+        balanceOf[from][id] = fromBalance - amount;
       }
     }
 
@@ -440,7 +407,7 @@ abstract contract ERC1155 is ERC165, IERC1155, IERC1155MetadataURI {
       owner != operator,
       "ERC1155::_setApprovalForAll: setting approval status for self"
     );
-    _operatorApprovals[owner][operator] = approved;
+    isApprovedForAll[owner][operator] = approved;
     emit ApprovalForAll(owner, operator, approved);
   }
 

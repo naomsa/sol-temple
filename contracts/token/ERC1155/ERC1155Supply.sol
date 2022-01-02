@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: GPL-3.0-or-later
 pragma solidity ^0.8.0;
 
 import "./ERC1155.sol";
@@ -16,7 +16,8 @@ abstract contract ERC1155Supply is ERC1155 {
   /*  \__, \| |_ ( (_| || |_ (  ___/  */
   /*  (____/`\__)`\__,_)`\__)`\____)  */
 
-  mapping(uint256 => uint256) private _totalSupply;
+  /// @notice Returns total amount of tokens minted by id.
+  mapping(uint256 => uint256) public totalSupply;
 
   /*   _                            */
   /*  (_ )                _         */
@@ -30,14 +31,9 @@ abstract contract ERC1155Supply is ERC1155 {
   /// @notice Upgradable pattern constructor.
   function __ERC1155Supply_init() internal {}
 
-  /// @notice Total amount of tokens in with a given id.
-  function totalSupply(uint256 id) public view virtual returns (uint256) {
-    return _totalSupply[id];
-  }
-
   /// @notice Indicates whether any token exist with a given id, or not./
   function exists(uint256 id) public view virtual returns (bool) {
-    return totalSupply(id) > 0;
+    return totalSupply[id] > 0;
   }
 
   /*             _                               _    */
@@ -59,14 +55,14 @@ abstract contract ERC1155Supply is ERC1155 {
     super._beforeTokenTransfer(operator, from, to, ids, amounts, data);
 
     if (from == address(0)) {
-      for (uint256 i = 0; i < ids.length; ++i) {
-        _totalSupply[ids[i]] += amounts[i];
+      for (uint256 i = 0; i < ids.length; i++) {
+        totalSupply[ids[i]] += amounts[i];
       }
     }
 
     if (to == address(0)) {
-      for (uint256 i = 0; i < ids.length; ++i) {
-        _totalSupply[ids[i]] -= amounts[i];
+      for (uint256 i = 0; i < ids.length; i++) {
+        totalSupply[ids[i]] -= amounts[i];
       }
     }
   }
