@@ -34,7 +34,7 @@ abstract contract ERC721Enumerable is ERC721, IERC721Enumerable {
     for (uint256 i; i < _owners.length; ++i) {
       if (owner == _owners[i]) {
         if (count == index) return i;
-        else ++count;
+        else count++;
       }
     }
     revert("ERC721Enumerable::tokenOfOwnerByIndex: Index out of bounds");
