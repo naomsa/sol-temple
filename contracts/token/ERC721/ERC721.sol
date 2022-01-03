@@ -339,7 +339,6 @@ abstract contract ERC721 is ERC165, IERC721, IERC721Metadata {
    *  As opposed to {transferFrom}, this imposes no restrictions on msg.sender.
    *
    * Requirements:
-   * - `to` cannot be the zero address.
    * - `tokenId` token must be owned by `from`.
    *
    * Emits a {Transfer} event.
@@ -403,17 +402,20 @@ abstract contract ERC721 is ERC165, IERC721, IERC721Metadata {
     uint256 tokenId,
     bytes memory data_
   ) private {
-    require(
-      !to.isContract() ||
-        IERC721Receiver(to).onERC721Received(
-          msg.sender,
-          from,
-          tokenId,
-          data_
-        ) ==
-        IERC721Receiver.onERC721Received.selector,
-      "ERC721::_checkOnERC721Received: transfer to non ERC721Receiver implementer"
-    );
+    if (to.isContract()) {
+      try
+        IERC721Receiver(to).onERC721Received(msg.sender, from, tokenId, data_)
+      returns (bytes4 returnValue) {
+        require(
+          returnValue == IERC721Receiver.onERC721Received.selector,
+          "ERC721::_checkOnERC721Received: transfer to non ERC721Receiver implementer"
+        );
+      } catch {
+        revert(
+          "ERC721::_checkOnERC721Received: transfer to non ERC721Receiver implementer"
+        );
+      }
+    }
   }
 
   /**
