@@ -1,6 +1,6 @@
 pragma solidity ^0.8;
 
-import "../token/ERC721/ERC721.sol";
+import "../../token/ERC721/ERC721.sol";
 
 contract ERC721Mock is ERC721 {
   constructor() {
