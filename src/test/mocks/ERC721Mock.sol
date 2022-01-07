@@ -1,12 +1,8 @@
-pragma solidity ^0.8;
+pragma solidity ^0.8.0;
 
-import "../../token/ERC721/ERC721.sol";
+import "../../tokens/ERC721/ERC721.sol";
 
-contract ERC721Mock is ERC721 {
-  constructor() {
-    __ERC721_init("ERC721 Mock", "ERC721");
-  }
-
+contract ERC721Mock is ERC721("ERC721 Mock", "MOCK") {
   function mint(address to, uint256 tokenId) external {
     _safeMint(to, tokenId);
   }

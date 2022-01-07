@@ -22,9 +22,15 @@ contract ERC721Test is DSTest {
     token.setApprovalForAll(address(this), true);
   }
 
+  // constructor
+  function testConstructor() public {
+    assertEq(token.name(), "ERC721 Mock");
+    assertEq(token.symbol(), "MOCK");
+  }
+
   // balanceOf
-  function testBalanceOf() view public {
-    require(token.balanceOf(owner) == 1);
+  function testBalanceOf() public {
+    assertEq(token.balanceOf(owner), 1);
   }
 
   function testBalanceOfZeroAddressQuery() public {
@@ -33,8 +39,8 @@ contract ERC721Test is DSTest {
   }
 
   // ownerOf
-  function testOwnerOf() public view {
-    require(token.ownerOf(0) == owner);
+  function testOwnerOf() public {
+    assertEq(token.ownerOf(0), owner);
   }
 
   function testOwnerOfZeroAddressQuery() public {
@@ -45,15 +51,15 @@ contract ERC721Test is DSTest {
   // transferFrom
   function testTransferFrom() public {
     token.transferFrom(owner, other, 0);
-    require(token.balanceOf(owner) == 0);
-    require(token.balanceOf(other) == 1);
-    require(token.ownerOf(0) == other);
+    assertEq(token.balanceOf(owner), 0);
+    assertEq(token.balanceOf(other), 1);
+    assertEq(token.ownerOf(0), other);
   }
 
   function testTransferFromCallback() public {
     ERC721ReceiverMock receiver = new ERC721ReceiverMock();
     token.transferFrom(owner, address(receiver), 0);
-    require(token.balanceOf(address(receiver)) == 1);
+    assertEq(token.balanceOf(address(receiver)), 1);
     require(!receiver.received());
   }
 
@@ -72,7 +78,7 @@ contract ERC721Test is DSTest {
   function testSafeTransferFrom() public {
     ERC721ReceiverMock receiver = new ERC721ReceiverMock();
     token.safeTransferFrom(owner, address(receiver), 0);
-    require(token.balanceOf(address(receiver)) == 1);
+    assertEq(token.balanceOf(address(receiver)), 1);
     require(receiver.received());
   }
 
@@ -97,9 +103,9 @@ contract ERC721Test is DSTest {
   // _burn
   function testBurn() public {
     token.burn(0);
-    require(token.balanceOf(owner) == 0);
+    assertEq(token.balanceOf(owner), 0);
     vm.expectRevert("ERC721::ownerOf: query for nonexistent token");
-    require(token.ownerOf(0) == address(0));
+    assertEq(token.ownerOf(0), address(0));
     vm.expectRevert("ERC721::getApproved: query for nonexistent token");
     token.getApproved(0);
   }
