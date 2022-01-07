@@ -10,6 +10,7 @@ import "@openzeppelin/contracts/utils/Strings.sol";
 
 /**
  * @title ERC1155
+ * @author naomsa <https://twitter.com/naomsa666>
  * @notice An upgradable ERC1155 standard contract modified from the original
  * OpenZeppelin implementation.
  */

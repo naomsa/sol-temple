@@ -11,6 +11,7 @@ import "@openzeppelin/contracts/utils/Strings.sol";
 
 /**
  * @title ERC721
+ * @author naomsa <https://twitter.com/naomsa666>
  * @notice An upgradable and gas-efficient ERC1721 standard contract modified
  * from the original OpenZeppelin implementation.
  */
