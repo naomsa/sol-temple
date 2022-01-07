@@ -62,7 +62,7 @@ abstract contract ERC721Enumerable is ERC721, IERC721Enumerable {
   }
 
   /// @notice Returns a list of all token Ids owned by `owner`.
-  function walletOfOwner(address owner) public view returns (uint256[] memory) {
+  function tokensOfOwner(address owner) public view returns (uint256[] memory) {
     uint256 balance = balanceOf(owner);
     uint256[] memory ids = new uint256[](balance);
     for (uint256 i = 0; i < balance; i++) {

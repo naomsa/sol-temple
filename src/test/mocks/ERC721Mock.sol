@@ -1,8 +1,10 @@
 pragma solidity ^0.8.0;
 
-import "../../tokens/ERC721/ERC721.sol";
+import "../../tokens/ERC721/ERC721Enumerable.sol";
 
-contract ERC721Mock is ERC721("ERC721 Mock", "MOCK") {
+contract ERC721Mock is ERC721Enumerable {
+  constructor() ERC721("ERC721 Mock", "MOCK") {}
+
   function mint(address to, uint256 tokenId) external {
     _safeMint(to, tokenId);
   }

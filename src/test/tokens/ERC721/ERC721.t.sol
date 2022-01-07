@@ -14,7 +14,7 @@ contract ERC721Test is DSTest {
   address other = address(2);
   uint256 nextTokenId;
 
-  function setUp() public{
+  function setUp() public {
     // Deploy mock(s)
     token = new ERC721Mock();
 
