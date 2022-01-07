@@ -12,7 +12,7 @@ contract ERC721Test is DSTest {
 
   address owner = address(1);
   address other = address(2);
-  uint256 nextTokenId;
+  uint256 nextId;
 
   function setUp() public {
     // Deploy mock(s)
@@ -20,7 +20,7 @@ contract ERC721Test is DSTest {
 
     // Do required action(s)
     token.mint(owner, 0);
-    nextTokenId = 1;
+    nextId = 1;
     vm.prank(owner);
     token.setApprovalForAll(address(this), true);
   }
@@ -72,9 +72,9 @@ contract ERC721Test is DSTest {
   }
 
   function testTransferFromNotApproved() public {
-    token.mint(other, nextTokenId);
+    token.mint(other, nextId);
     vm.expectRevert("ERC721::transferFrom: transfer caller is not owner nor approved");
-    token.transferFrom(other, owner, nextTokenId);
+    token.transferFrom(other, owner, nextId);
   }
 
   // safeTransferFrom
@@ -92,12 +92,17 @@ contract ERC721Test is DSTest {
   }
 
   function testSafeTransferFromNotApproved() public {
-    token.mint(other, nextTokenId);
+    token.mint(other, nextId);
     vm.expectRevert("ERC721::safeTransferFrom: transfer caller is not owner nor approved");
-    token.safeTransferFrom(other, owner, nextTokenId);
+    token.safeTransferFrom(other, owner, nextId);
   }
 
   // _mint
+  function testMint() public {
+    token.mint(owner, nextId);
+    assertEq(token.balanceOf(owner), 2);
+  }
+
   function testMintAlreadyMinted() public {
     vm.expectRevert("ERC721::_mint: token already minted");
     token.mint(owner, 0);

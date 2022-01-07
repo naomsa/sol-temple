@@ -191,7 +191,7 @@ abstract contract ERC1155 is ERC165, IERC1155, IERC1155MetadataURI {
       ids.length == amounts.length,
       "ERC1155::_safeBatchTransferFrom: ids and amounts length mismatch"
     );
-    require(to != address(0), "ERC1155: transfer to the zero address");
+    require(to != address(0), "ERC1155::_safeBatchTransferFrom: transfer to the zero address");
 
     _beforeTokenTransfer(msg.sender, from, to, ids, amounts, data);
 
@@ -398,18 +398,26 @@ abstract contract ERC1155 is ERC165, IERC1155, IERC1155MetadataURI {
     uint256 amount,
     bytes memory data
   ) private {
-    require(
-      !to.isContract() ||
+    if (to.isContract()) {
+      try
         IERC1155Receiver(to).onERC1155Received(
           operator,
           from,
           id,
           amount,
           data
-        ) ==
-        IERC1155Receiver.onERC1155Received.selector,
-      "ERC1155::_checkOnERC1155Received: transfer to non ERC1155Receiver implementer"
-    );
+        )
+      returns (bytes4 returnValue) {
+        require(
+          returnValue == IERC1155Receiver.onERC1155Received.selector,
+          "ERC1155::_checkOnERC1155Received: transfer to non ERC1155Receiver implementer"
+        );
+      } catch {
+        revert(
+          "ERC1155::_checkOnERC1155Received: transfer to non ERC1155Receiver implementer"
+        );
+      }
+    }
   }
 
   function _checkOnERC1155BatchReceived(
@@ -420,18 +428,26 @@ abstract contract ERC1155 is ERC165, IERC1155, IERC1155MetadataURI {
     uint256[] memory amounts,
     bytes memory data
   ) private {
-    require(
-      !to.isContract() ||
+    if (to.isContract()) {
+      try
         IERC1155Receiver(to).onERC1155BatchReceived(
           operator,
           from,
           ids,
           amounts,
           data
-        ) ==
-        IERC1155Receiver.onERC1155BatchReceived.selector,
-      "ERC1155::_checkOnERC1155BatchReceived: transfer to non ERC1155Receiver implementer"
-    );
+        )
+      returns (bytes4 returnValue) {
+        require(
+          returnValue == IERC1155Receiver.onERC1155BatchReceived.selector,
+          "ERC1155::_checkOnERC1155BatchReceived: transfer to non ERC1155Receiver implementer"
+        );
+      } catch {
+        revert(
+          "ERC1155::_checkOnERC1155BatchReceived: transfer to non ERC1155Receiver implementer"
+        );
+      }
+    }
   }
 
   function _asSingletonArray(uint256 element)
