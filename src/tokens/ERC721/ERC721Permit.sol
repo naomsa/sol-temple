@@ -3,16 +3,16 @@ pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
-import "../../interfaces/IERC1155Permit.sol";
+import "../../interfaces/IERC721Permit.sol";
 import "../../interfaces/IERC1271.sol";
-import "./ERC1155.sol";
+import "./ERC721.sol";
 
 /**
- * @title ERC1155 Permit
- * @notice Extension of ERC1155 that implements EIP-4494 for cheaper transactions
+ * @title ERC721 Permit
+ * @notice Extension of ERC721 that implements EIP-4494 for cheaper transactions
  * making approve transactions off-chain and gasless.
  */
-abstract contract ERC1155Permit is IERC1155Permit, ERC1155 {
+abstract contract ERC721Permit is IERC721Permit, ERC721 {
   using ECDSA for bytes32;
   using Address for address;
 
@@ -23,18 +23,14 @@ abstract contract ERC1155Permit is IERC1155Permit, ERC1155 {
   /*  \__, \| |_ ( (_| || |_ (  ___/  */
   /*  (____/`\__)`\__,_)`\__)`\____)  */
 
-  /// @notice See {IERC1155Permit-nonces}.
+  /// @notice See {IERC721Permit-nonces}.
   mapping(address => uint256) public nonces;
 
-  /// @notice keccak256("Permit(address owner,address operator,uint256 nonce,uint256 deadline)");
+  /// @notice keccak256("Permit(address spender,uint256 tokenId,uint256 nonce,uint256 deadline)");
   bytes32 public constant PERMIT_TYPEHASH =
-    0x16efd59368a9abbac9954a7e691dd7d75c14d374c4fd2e0ea5eb8eebe3cfc3fd;
+    0x49ecf333e5b8c95c40fdafc95c1ad136e8914a8fb55e9dc8bb01eaa83a2df9ad;
 
-  /// @notice keccak256("EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)");
-  bytes32 public constant DOMAIN_TYPEHASH =
-    0x8b73c3c69bb8fe3d512ecc4cf759cc79239f7b179b0ffacaa9a75d522b39400f;
-
-  bytes32 public _DOMAIN_SEPARATOR;
+  bytes32 public immutable _DOMAIN_SEPARATOR;
 
   /*   _                            */
   /*  (_ )                _         */
@@ -45,58 +41,61 @@ abstract contract ERC1155Permit is IERC1155Permit, ERC1155 {
   /*              ( )_) |           */
   /*               \___/'           */
 
-  /// @notice Upgradable pattern constructor.
-  function __ERC1155Permit_init(string memory name_, string memory version_)
-    internal
-  {
+  constructor(string memory version_) {
     _DOMAIN_SEPARATOR = _hashDomain(
-      name_,
+      name,
       version_,
       block.chainid,
       address(this)
     );
   }
 
-  /// @notice See {IERC1155Permit-DOMAIN_SEPARATOR}.
+  /// @notice See {IERC721Permit.DOMAIN_SEPARATOR}.
   function DOMAIN_SEPARATOR() external view returns (bytes32) {
     return _DOMAIN_SEPARATOR;
   }
 
-  /// @notice See {IERC1155Permit-permit}.
+  /// @notice See {IERC721Permit.permit}.
   function permit(
-    address owner,
-    address operator,
+    address spender,
+    uint256 tokenId,
     uint256 deadline,
     bytes memory sig
   ) external {
     require(
       deadline >= block.timestamp,
-      "ERC1155Permit::permit: expired signature"
+      "ERC721Permit::permit: expired signature"
+    );
+
+    address owner = ownerOf(tokenId);
+    require(
+      owner != address(0),
+      "ERC721Permit::permit: query for nonexisting token"
     );
     require(
-      owner != operator,
-      "ERC1155Permit::permit: setting approval status for self"
+      owner != spender,
+      "ERC721Permit::permit: setting approval status for self"
     );
 
     bytes32 message = _hashMessage(
       _DOMAIN_SEPARATOR,
       keccak256(
-        abi.encode(PERMIT_TYPEHASH, owner, operator, nonces[owner]++, deadline)
+        abi.encode(PERMIT_TYPEHASH, spender, tokenId, nonces[owner]++, deadline)
       )
     );
 
     if (owner.isContract()) {
       require(
         IERC1271(owner).isValidSignature(message, sig) == 0x1626ba7e,
-        "ERC1155Permit::permit: invalid signature"
+        "ERC721Permit::permit: invalid signature"
       );
     } else {
       address signer = message.recover(sig);
-      require(signer != address(0), "ERC1155Permit::permit: invalid signature");
-      require(signer == owner, "ERC1155Permit::permit: signer not authorized");
+      require(signer != address(0), "ERC721Permit::permit: invalid signature");
+      require(signer == owner, "ERC721Permit::permit: signer not authorized");
     }
 
-    _setApprovalForAll(owner, operator, true);
+    super._approve(owner, tokenId);
   }
 
   /*             _                               _    */
@@ -124,7 +123,8 @@ abstract contract ERC1155Permit is IERC1155Permit, ERC1155 {
       let memPtr := mload(64)
 
       // Store params in memory
-      mstore(memPtr, DOMAIN_TYPEHASH)
+      // keccak256("EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)");
+      mstore(memPtr, 0x8b73c3c69bb8fe3d512ecc4cf759cc79239f7b179b0ffacaa9a75d522b39400f)
       mstore(add(memPtr, 32), nameHash)
       mstore(add(memPtr, 64), versionHash)
       mstore(add(memPtr, 96), chainId)
@@ -173,11 +173,11 @@ abstract contract ERC1155Permit is IERC1155Permit, ERC1155 {
     public
     view
     virtual
-    override(IERC165, ERC1155)
+    override(IERC165, ERC721)
     returns (bool)
   {
     return
-      interfaceId == type(IERC1155Permit).interfaceId ||
+      interfaceId == type(IERC721Permit).interfaceId ||
       super.supportsInterface(interfaceId);
   }
 }

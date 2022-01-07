@@ -28,9 +28,6 @@ abstract contract ERC1155Supply is ERC1155 {
   /*              ( )_) |           */
   /*               \___/'           */
 
-  /// @notice Upgradable pattern constructor.
-  function __ERC1155Supply_init() internal {}
-
   /// @notice Indicates whether any token exist with a given id, or not./
   function exists(uint256 id) public view virtual returns (bool) {
     return totalSupply[id] > 0;

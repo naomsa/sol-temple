@@ -38,7 +38,7 @@ abstract contract ERC721 is ERC165, IERC721, IERC721Metadata {
   mapping(uint256 => address) private _tokenApprovals;
 
   /// @notice Mapping from owner to operator approvals.
-  mapping(address => mapping(address => bool)) private _operatorApprovals;
+  mapping(address => mapping(address => bool)) public isApprovedForAll;
 
   /*   _                            */
   /*  (_ )                _         */
@@ -49,8 +49,7 @@ abstract contract ERC721 is ERC165, IERC721, IERC721Metadata {
   /*              ( )_) |           */
   /*               \___/'           */
 
-  /// @notice Upgradable pattern constructor.
-  function __ERC721_init(string memory name_, string memory symbol_) internal {
+  constructor(string memory name_, string memory symbol_) {
     name = name_;
     symbol = symbol_;
   }
@@ -113,7 +112,7 @@ abstract contract ERC721 is ERC165, IERC721, IERC721Metadata {
     require(to != owner, "ERC721::approve: approval to current owner");
 
     require(
-      msg.sender == owner || isApprovedForAll(owner, msg.sender),
+      msg.sender == owner || isApprovedForAll[owner][msg.sender],
       "ERC721::approve: caller is not owner nor approved for all"
     );
 
@@ -142,17 +141,6 @@ abstract contract ERC721 is ERC165, IERC721, IERC721Metadata {
     override
   {
     _setApprovalForAll(msg.sender, operator, approved);
-  }
-
-  /// @notice See {IERC721-isApprovedForAll}.
-  function isApprovedForAll(address owner, address operator)
-    public
-    view
-    virtual
-    override
-    returns (bool)
-  {
-    return _operatorApprovals[owner][operator];
   }
 
   /// @notice See {IERC721-transferFrom}.
@@ -266,7 +254,7 @@ abstract contract ERC721 is ERC165, IERC721, IERC721Metadata {
     address owner = ERC721.ownerOf(tokenId);
     return (spender == owner ||
       getApproved(tokenId) == spender ||
-      isApprovedForAll(owner, spender));
+      isApprovedForAll[owner][spender]);
   }
 
   /**
@@ -383,7 +371,7 @@ abstract contract ERC721 is ERC165, IERC721, IERC721Metadata {
     bool approved
   ) internal virtual {
     require(owner != operator, "ERC721::_setApprovalForAll: approve to caller");
-    _operatorApprovals[owner][operator] = approved;
+    isApprovedForAll[owner][operator] = approved;
     emit ApprovalForAll(owner, operator, approved);
   }
 

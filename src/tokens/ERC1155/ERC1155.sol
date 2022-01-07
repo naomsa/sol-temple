@@ -38,9 +38,6 @@ abstract contract ERC1155 is ERC165, IERC1155, IERC1155MetadataURI {
   /*              ( )_) |           */
   /*               \___/'           */
 
-  /// @notice Upgradable pattern constructor.
-  function __ERC1155_init() internal {}
-
   /**
    * @notice See {IERC1155MetadataURI-uri}.
    * This implementation returns the same URI for *all* token types. It relies
