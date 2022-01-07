@@ -2,7 +2,6 @@
 pragma solidity 0.8.11;
 
 import "ds-test/test.sol";
-import "../../console.sol";
 import "../../vm.sol";
 import "../../mocks/ERC721Mock.sol";
 import "../../mocks/ERC721ReceiverMock.sol";
