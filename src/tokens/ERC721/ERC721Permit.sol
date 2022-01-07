@@ -3,8 +3,8 @@ pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
-import "../interfaces/IERC721Permit.sol";
-import "../interfaces/IERC1271.sol";
+import "../../interfaces/IERC721Permit.sol";
+import "../../interfaces/IERC1271.sol";
 import "./ERC721.sol";
 
 /**

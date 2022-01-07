@@ -12,12 +12,15 @@ contract ERC721Test is DSTest {
 
   address owner = address(1);
   address other = address(2);
-  uint256 nextTokenId = 1;
+  uint256 nextTokenId;
 
   function setUp() public{
+    // Deploy mock(s)
     token = new ERC721Mock();
-    token.mint(owner, 0);
 
+    // Do required action(s)
+    token.mint(owner, 0);
+    nextTokenId = 1;
     vm.prank(owner);
     token.setApprovalForAll(address(this), true);
   }
