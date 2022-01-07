@@ -25,7 +25,7 @@ abstract contract ERC721Permit is IERC721Permit, ERC721 {
   /*  (____/`\__)`\__,_)`\__)`\____)  */
 
   /// @notice See {IERC721Permit-nonces}.
-  mapping(address => uint256) public nonces;
+  mapping(uint256 => uint256) public nonces;
 
   /// @notice keccak256("Permit(address spender,uint256 tokenId,uint256 nonce,uint256 deadline)");
   bytes32 public constant PERMIT_TYPEHASH =
@@ -81,7 +81,7 @@ abstract contract ERC721Permit is IERC721Permit, ERC721 {
     bytes32 message = _hashMessage(
       _DOMAIN_SEPARATOR,
       keccak256(
-        abi.encode(PERMIT_TYPEHASH, spender, tokenId, nonces[owner]++, deadline)
+        abi.encode(PERMIT_TYPEHASH, spender, tokenId, nonces[tokenId]++, deadline)
       )
     );
 
