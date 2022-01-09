@@ -14,13 +14,29 @@ abstract contract ERC1155 {
   /*  (____/`\__)`\__,_)`\__)`\____)  */
 
   /// @notice Either `TransferSingle` or `TransferBatch` MUST emit when tokens are transferred, including zero value transfers as well as minting or burning (see "Safe Transfer Rules" section of the standard).
-  event TransferSingle(address indexed _operator, address indexed _from, address indexed _to, uint256 _id, uint256 _value);
+  event TransferSingle(
+    address indexed _operator,
+    address indexed _from,
+    address indexed _to,
+    uint256 _id,
+    uint256 _value
+  );
 
-  /// @notice Either `TransferSingle` or `TransferBatch` MUST emit when tokens are transferred, including zero value transfers as well as minting or burning (see "Safe Transfer Rules" section of the standard).      
-  event TransferBatch(address indexed _operator, address indexed _from, address indexed _to, uint256[] _ids, uint256[] _values);
+  /// @notice Either `TransferSingle` or `TransferBatch` MUST emit when tokens are transferred, including zero value transfers as well as minting or burning (see "Safe Transfer Rules" section of the standard).
+  event TransferBatch(
+    address indexed _operator,
+    address indexed _from,
+    address indexed _to,
+    uint256[] _ids,
+    uint256[] _values
+  );
 
-  /// @notice MUST emit when approval for a second party/operator address to manage all tokens for an owner address is enabled or disabled (absence of an event assumes disabled).        
-  event ApprovalForAll(address indexed _owner, address indexed _operator, bool _approved);
+  /// @notice MUST emit when approval for a second party/operator address to manage all tokens for an owner address is enabled or disabled (absence of an event assumes disabled).
+  event ApprovalForAll(
+    address indexed _owner,
+    address indexed _operator,
+    bool _approved
+  );
 
   /// @notice MUST emit when the URI is updated for a token ID.
   event URI(string _value, uint256 indexed _id);
@@ -79,10 +95,7 @@ abstract contract ERC1155 {
   /**
    * @notice See {IERC1155-setApprovalForAll}.
    */
-  function setApprovalForAll(address operator, bool approved)
-    public
-    virtual
-  {
+  function setApprovalForAll(address operator, bool approved) public virtual {
     _setApprovalForAll(msg.sender, operator, approved);
   }
 
@@ -149,10 +162,7 @@ abstract contract ERC1155 {
     uint256 amount,
     bytes memory data
   ) internal virtual {
-    require(
-      to != address(0),
-      "ERC1155: transfer to the zero address"
-    );
+    require(to != address(0), "ERC1155: transfer to the zero address");
 
     _beforeTokenTransfer(
       msg.sender,
@@ -333,14 +343,7 @@ abstract contract ERC1155 {
       "ERC1155: ids and amounts length mismatch"
     );
 
-    _beforeTokenTransfer(
-      msg.sender,
-      from,
-      address(0),
-      ids,
-      amounts,
-      ""
-    );
+    _beforeTokenTransfer(msg.sender, from, address(0), ids, amounts, "");
 
     for (uint256 i = 0; i < ids.length; i++) {
       require(
@@ -364,10 +367,7 @@ abstract contract ERC1155 {
     address operator,
     bool approved
   ) internal virtual {
-    require(
-      owner != operator,
-      "ERC1155: setting approval status for self"
-    );
+    require(owner != operator, "ERC1155: setting approval status for self");
     isApprovedForAll[owner][operator] = approved;
     emit ApprovalForAll(owner, operator, approved);
   }
@@ -417,22 +417,14 @@ abstract contract ERC1155 {
   ) private {
     if (to.code.length > 0) {
       try
-        IERC1155Receiver(to).onERC1155Received(
-          operator,
-          from,
-          id,
-          amount,
-          data
-        )
+        IERC1155Receiver(to).onERC1155Received(operator, from, id, amount, data)
       returns (bytes4 returnValue) {
         require(
           returnValue == 0xf23a6e61,
           "ERC1155: transfer to non ERC1155Receiver implementer"
         );
       } catch {
-        revert(
-          "ERC1155: transfer to non ERC1155Receiver implementer"
-        );
+        revert("ERC1155: transfer to non ERC1155Receiver implementer");
       }
     }
   }
@@ -460,9 +452,7 @@ abstract contract ERC1155 {
           "ERC1155: transfer to non ERC1155Receiver implementer"
         );
       } catch {
-        revert(
-          "ERC1155: transfer to non ERC1155Receiver implementer"
-        );
+        revert("ERC1155: transfer to non ERC1155Receiver implementer");
       }
     }
   }

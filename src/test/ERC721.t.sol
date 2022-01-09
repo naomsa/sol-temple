@@ -87,7 +87,9 @@ contract ERC721Test is DSTest {
 
   function testSafeTransferFromNonReceiver() public {
     vm.startPrank(owner);
-    vm.expectRevert("ERC721: safe transfer to non ERC721Receiver implementation");
+    vm.expectRevert(
+      "ERC721: safe transfer to non ERC721Receiver implementation"
+    );
     token.safeTransferFrom(owner, address(this), 0);
   }
 
@@ -179,6 +181,5 @@ contract ERC721Test is DSTest {
     assertEq(wallet.length, 2);
     assertEq(wallet[0], 0);
     assertEq(wallet[1], 1);
-
   }
 }

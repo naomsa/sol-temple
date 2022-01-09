@@ -1,12 +1,19 @@
 {
 	"name": "sol-temple",
 	"version": "1.0.0",
-	"files": [
-		"src/**/*.sol",
-		"!**/*.t.sol",
-		"!**/*Mock.sol"
-	],
+	"author": "naomsa <https://twitter.com/naomsa666>",
+	"license": "GPL-3.0-or-later",
+	"description": "A solidity temple for gas optimized and super efficient contracts. Built with Foundry's forge.",
 	"repository": "git@github.com:naomsa/sol-temple.git",
-	"author": "naomsa <omar@na2.com.br>",
-	"license": "MIT"
+	"homepage": "https://github.com/naomsa/sol-temple",
+	"files": [
+		"src/**/*.sol"
+	],
+	"scripts": {
+		"format": "prettier --write src/**/*.sol"
+	},
+	"devDependencies": {
+		"prettier": "^2.5.1",
+		"prettier-plugin-solidity": "^1.0.0-beta.19"
+	}
 }

@@ -83,7 +83,6 @@ contract ERC1155Test is DSTest {
     token.safeTransferFrom(owner, address(this), id, 1, "");
   }
 
-
   // safeBatchTransferFrom
   function testSafeBatchTransferFrom() public {
     ERC1155ReceiverMock receiver = new ERC1155ReceiverMock();
@@ -214,7 +213,7 @@ contract ERC1155Test is DSTest {
   }
 
   // exists
-  function testExists(uint256 id_) view public {
+  function testExists(uint256 id_) public view {
     require(token.exists(id));
     require(!token.exists(id_));
   }

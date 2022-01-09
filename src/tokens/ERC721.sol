@@ -16,13 +16,25 @@ contract ERC721 {
   /*  (____/`\__)`\__,_)`\__)`\____)  */
 
   /// @dev This emits when ownership of any NFT changes by any mechanism.
-  event Transfer(address indexed _from, address indexed _to, uint256 indexed _tokenId);
+  event Transfer(
+    address indexed _from,
+    address indexed _to,
+    uint256 indexed _tokenId
+  );
 
   /// @dev This emits when the approved address for an NFT is changed or
-  event Approval(address indexed _owner, address indexed _approved, uint256 indexed _tokenId);
+  event Approval(
+    address indexed _owner,
+    address indexed _approved,
+    uint256 indexed _tokenId
+  );
 
   /// @dev This emits when an operator is enabled or disabled for an owner.
-  event ApprovalForAll(address indexed _owner, address indexed _operator, bool _approved);
+  event ApprovalForAll(
+    address indexed _owner,
+    address indexed _operator,
+    bool _approved
+  );
 
   /// @notice See {IERC721Metadata-name}.
   string public name;
@@ -54,17 +66,8 @@ contract ERC721 {
   }
 
   /// @notice See {IERC721-balanceOf}.
-  function balanceOf(address owner)
-    public
-    view
-    virtual
-    
-    returns (uint256)
-  {
-    require(
-      owner != address(0),
-      "ERC721: balance query for the zero address"
-    );
+  function balanceOf(address owner) public view virtual returns (uint256) {
+    require(owner != address(0), "ERC721: balance query for the zero address");
 
     uint256 balance;
     for (uint256 i = 0; i < _owners.length; i++) {
@@ -74,27 +77,17 @@ contract ERC721 {
   }
 
   /// @notice See {IERC721-ownerOf}.
-  function ownerOf(uint256 tokenId)
-    public
-    view
-    virtual
-    
-    returns (address)
-  {
+  function ownerOf(uint256 tokenId) public view virtual returns (address) {
     require(_exists(tokenId), "ERC721: query for nonexistent token");
     address owner = _owners[tokenId];
     return owner;
   }
 
   /// @notice See {IERC721Metadata-tokenURI}.
-  function tokenURI(uint256)
-    public
-    view
-    virtual
-    returns (string memory) {}
+  function tokenURI(uint256) public view virtual returns (string memory) {}
 
   /// @notice See {IERC721-approve}.
-  function approve(address to, uint256 tokenId) public virtual{
+  function approve(address to, uint256 tokenId) public virtual {
     address owner = ERC721.ownerOf(tokenId);
     require(to != owner, "ERC721: approval to current owner");
 
@@ -107,24 +100,13 @@ contract ERC721 {
   }
 
   /// @notice See {IERC721-getApproved}.
-  function getApproved(uint256 tokenId)
-    public
-    view
-    virtual
-    returns (address)
-  {
-    require(
-      _exists(tokenId),
-      "ERC721: query for nonexistent token"
-    );
+  function getApproved(uint256 tokenId) public view virtual returns (address) {
+    require(_exists(tokenId), "ERC721: query for nonexistent token");
     return _tokenApprovals[tokenId];
   }
 
   /// @notice See {IERC721-setApprovalForAll}.
-  function setApprovalForAll(address operator, bool approved)
-    public
-    virtual
-  {
+  function setApprovalForAll(address operator, bool approved) public virtual {
     _setApprovalForAll(msg.sender, operator, approved);
   }
 
@@ -190,16 +172,8 @@ contract ERC721 {
   }
 
   /// @notice See {IERC721Enumerable.tokenByIndex}.
-  function tokenByIndex(uint256 index)
-    public
-    view
-    virtual
-    returns (uint256)
-  {
-    require(
-      index < _owners.length,
-      "ERC721Enumerable: Index out of bounds"
-    );
+  function tokenByIndex(uint256 index) public view virtual returns (uint256) {
+    require(index < _owners.length, "ERC721Enumerable: Index out of bounds");
     return index;
   }
 
@@ -271,10 +245,7 @@ contract ERC721 {
     virtual
     returns (bool)
   {
-    require(
-      _exists(tokenId),
-      "ERC721: query for nonexistent token"
-    );
+    require(_exists(tokenId), "ERC721: query for nonexistent token");
     address owner = ERC721.ownerOf(tokenId);
     return (spender == owner ||
       getApproved(tokenId) == spender ||
@@ -415,8 +386,13 @@ contract ERC721 {
     bytes memory data
   ) private {
     if (to.code.length > 0) {
-      try IERC721Receiver(to).onERC721Received(msg.sender, from, tokenId, data) returns (bytes4 returned) {
-        require(returned == 0x150b7a02, "ERC721: safe transfer to non ERC721Receiver implementation");
+      try
+        IERC721Receiver(to).onERC721Received(msg.sender, from, tokenId, data)
+      returns (bytes4 returned) {
+        require(
+          returned == 0x150b7a02,
+          "ERC721: safe transfer to non ERC721Receiver implementation"
+        );
       } catch (bytes memory reason) {
         if (reason.length == 0) {
           revert("ERC721: safe transfer to non ERC721Receiver implementation");
@@ -474,5 +450,5 @@ interface IERC721Receiver {
     address from,
     uint256 tokenId,
     bytes memory data
-  ) external returns(bytes4);
+  ) external returns (bytes4);
 }
