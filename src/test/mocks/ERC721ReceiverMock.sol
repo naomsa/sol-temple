@@ -1,8 +1,7 @@
+// SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.0;
 
-import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
-
-contract ERC721ReceiverMock is IERC721Receiver {
+contract ERC721ReceiverMock {
   bool public received;
 
   function onERC721Received(
@@ -12,6 +11,6 @@ contract ERC721ReceiverMock is IERC721Receiver {
     bytes calldata
   ) external returns (bytes4) {
     received = true;
-    return IERC721Receiver.onERC721Received.selector;
+    return 0x150b7a02;
   }
 }

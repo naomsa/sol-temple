@@ -1,11 +1,9 @@
+// SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.0;
 
-import "../../tokens/ERC721/ERC721Enumerable.sol";
-import "../../tokens/ERC721/ERC721Permit.sol";
+import "../../tokens/ERC721.sol";
 
-contract ERC721Mock is ERC721Enumerable, ERC721Permit {
-  constructor() ERC721("ERC721 Mock", "MOCK") ERC721Permit("1") {}
-
+contract ERC721Mock is ERC721("ERC721 Mock", "MOCK") {
   function mint(address to, uint256 tokenId) external {
     _safeMint(to, tokenId);
   }
@@ -16,9 +14,5 @@ contract ERC721Mock is ERC721Enumerable, ERC721Permit {
 
   function exists(uint256 tokenId) external view returns (bool) {
     return _exists(tokenId);
-  }
-
-  function supportsInterface(bytes4 interfaceId) public view override(ERC721Enumerable, ERC721Permit) returns(bool) {
-    return super.supportsInterface(interfaceId);
   }
 }
