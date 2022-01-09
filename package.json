@@ -1,0 +1,12 @@
+{
+	"name": "sol-temple",
+	"version": "1.0.0",
+	"files": [
+		"src/**/*.sol",
+		"!**/*.t.sol",
+		"!**/*Mock.sol"
+	],
+	"repository": "git@github.com:naomsa/sol-temple.git",
+	"author": "naomsa <omar@na2.com.br>",
+	"license": "MIT"
+}
