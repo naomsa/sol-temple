@@ -2,9 +2,9 @@
 pragma solidity 0.8.11;
 
 import "ds-test/test.sol";
-import "../../vm.sol";
-import "../../mocks/ERC1155Mock.sol";
-import "../../mocks/ERC1155ReceiverMock.sol";
+import "./vm.sol";
+import "./mocks/ERC1155Mock.sol";
+import "./mocks/ERC1155ReceiverMock.sol";
 
 contract ERC1155Test is DSTest {
   Vm vm = Vm(0x7109709ECfa91a80626fF3989D68f67F5b1DD12D);
@@ -50,7 +50,7 @@ contract ERC1155Test is DSTest {
     address[] memory accounts = new address[](2);
     uint256[] memory ids = new uint256[](1);
 
-    vm.expectRevert("ERC1155::balanceOfBatch: accounts and ids length mismatch");
+    vm.expectRevert("ERC1155: accounts and ids length mismatch");
     token.balanceOfBatch(accounts, ids);
   }
 
@@ -63,23 +63,23 @@ contract ERC1155Test is DSTest {
   }
 
   function testSafeTransferFromNotApproved() public {
-    vm.expectRevert("ERC1155::safeTransferFrom: caller is not owner nor approved");
+    vm.expectRevert("ERC1155: caller is not owner nor approved");
     token.safeTransferFrom(other, owner, id, 1, "");
   }
 
   function testSafeTransferFromToZeroAddress() public {
-    vm.expectRevert("ERC1155::_safeTransferFrom: transfer to the zero address");
+    vm.expectRevert("ERC1155: transfer to the zero address");
     token.safeTransferFrom(owner, address(0), id, 1, "");
   }
 
   function testSafeTransferFromInsufficientBalance() public {
-    vm.expectRevert("ERC1155::_safeTransferFrom: insufficient balance for transfer");
+    vm.expectRevert("ERC1155: insufficient balance for transfer");
     token.safeTransferFrom(owner, other, id, 2, "");
   }
 
   function testSafeTransferFromNonReceiver() public {
     vm.startPrank(owner);
-    vm.expectRevert("ERC1155::_checkOnERC1155Received: transfer to non ERC1155Receiver implementer");
+    vm.expectRevert("ERC1155: transfer to non ERC1155Receiver implementer");
     token.safeTransferFrom(owner, address(this), id, 1, "");
   }
 
@@ -103,7 +103,7 @@ contract ERC1155Test is DSTest {
     uint256[] memory amounts = new uint256[](1);
     ids[0] = id;
     ids[1] = 1;
-    vm.expectRevert("ERC1155::safeBatchTransferFrom: transfer caller is not owner nor approved");
+    vm.expectRevert("ERC1155: transfer caller is not owner nor approved");
     token.safeBatchTransferFrom(other, owner, ids, amounts, "");
   }
 
@@ -116,7 +116,7 @@ contract ERC1155Test is DSTest {
     ids[1] = 1;
     amounts[0] = 1;
 
-    vm.expectRevert("ERC1155::_safeBatchTransferFrom: ids and amounts length mismatch");
+    vm.expectRevert("ERC1155: ids and amounts length mismatch");
     token.safeBatchTransferFrom(owner, address(receiver), ids, amounts, "");
   }
 
@@ -125,7 +125,7 @@ contract ERC1155Test is DSTest {
     uint256[] memory amounts = new uint256[](1);
     ids[0] = id;
     amounts[0] = 1;
-    vm.expectRevert("ERC1155::_safeBatchTransferFrom: transfer to the zero address");
+    vm.expectRevert("ERC1155: transfer to the zero address");
     token.safeBatchTransferFrom(owner, address(0), ids, amounts, "");
   }
 
@@ -135,7 +135,7 @@ contract ERC1155Test is DSTest {
     ids[0] = id + 1;
     amounts[0] = 2;
 
-    vm.expectRevert("ERC1155::_safeBatchTransferFrom: insufficient balance for transfer");
+    vm.expectRevert("ERC1155: insufficient balance for transfer");
     token.safeBatchTransferFrom(owner, other, ids, amounts, "");
   }
 
@@ -146,7 +146,7 @@ contract ERC1155Test is DSTest {
     amounts[0] = 1;
 
     vm.startPrank(owner);
-    vm.expectRevert("ERC1155::_checkOnERC1155BatchReceived: transfer to non ERC1155Receiver implementer");
+    vm.expectRevert("ERC1155: transfer to non ERC1155Receiver implementer");
     token.safeBatchTransferFrom(owner, address(this), ids, amounts, "");
   }
 
@@ -202,7 +202,20 @@ contract ERC1155Test is DSTest {
 
   function testSetApprovalForAllToCaller() public {
     vm.startPrank(owner);
-    vm.expectRevert("ERC1155::_setApprovalForAll: setting approval status for self");
+    vm.expectRevert("ERC1155: setting approval status for self");
     token.setApprovalForAll(owner, true);
+  }
+
+  // totalSupply
+  function testTotalSupply() public {
+    assertEq(token.totalSupply(id), 2);
+    token.mint(owner, id, 1);
+    assertEq(token.totalSupply(id), 3);
+  }
+
+  // exists
+  function testExists(uint256 id_) view public {
+    require(token.exists(id));
+    require(!token.exists(id_));
   }
 }

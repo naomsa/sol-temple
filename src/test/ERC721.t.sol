@@ -1,10 +1,10 @@
-// SPDX-License-Identifier: UNLICESED
-pragma solidity 0.8.11;
+// SPDX-License-Identifier: UNLICENSED
+pragma solidity ^0.8.0;
 
 import "ds-test/test.sol";
-import "../../vm.sol";
-import "../../mocks/ERC721Mock.sol";
-import "../../mocks/ERC721ReceiverMock.sol";
+import "./vm.sol";
+import "./mocks/ERC721Mock.sol";
+import "./mocks/ERC721ReceiverMock.sol";
 
 contract ERC721Test is DSTest {
   Vm vm = Vm(0x7109709ECfa91a80626fF3989D68f67F5b1DD12D);
@@ -37,7 +37,7 @@ contract ERC721Test is DSTest {
   }
 
   function testBalanceOfZeroAddressQuery() public {
-    vm.expectRevert("ERC721::balanceOf: balance query for the zero address");
+    vm.expectRevert("ERC721: balance query for the zero address");
     token.balanceOf(address(0));
   }
 
@@ -47,7 +47,7 @@ contract ERC721Test is DSTest {
   }
 
   function testOwnerOfZeroAddressQuery() public {
-    vm.expectRevert("ERC721::ownerOf: query for nonexistent token");
+    vm.expectRevert("ERC721: query for nonexistent token");
     token.ownerOf(1);
   }
 
@@ -67,13 +67,13 @@ contract ERC721Test is DSTest {
   }
 
   function testTransferFromNotOwner() public {
-    vm.expectRevert("ERC721::_transfer: transfer of token that is not own");
+    vm.expectRevert("ERC721: transfer of token that is not own");
     token.transferFrom(other, owner, 0);
   }
 
   function testTransferFromNotApproved() public {
     token.mint(other, nextId);
-    vm.expectRevert("ERC721::transferFrom: transfer caller is not owner nor approved");
+    vm.expectRevert("ERC721: transfer caller is not owner nor approved");
     token.transferFrom(other, owner, nextId);
   }
 
@@ -87,13 +87,13 @@ contract ERC721Test is DSTest {
 
   function testSafeTransferFromNonReceiver() public {
     vm.startPrank(owner);
-    vm.expectRevert("ERC721::_checkOnERC721Received: transfer to non ERC721Receiver implementer");
+    vm.expectRevert("ERC721: safe transfer to non ERC721Receiver implementation");
     token.safeTransferFrom(owner, address(this), 0);
   }
 
   function testSafeTransferFromNotApproved() public {
     token.mint(other, nextId);
-    vm.expectRevert("ERC721::safeTransferFrom: transfer caller is not owner nor approved");
+    vm.expectRevert("ERC721: transfer caller is not owner nor approved");
     token.safeTransferFrom(other, owner, nextId);
   }
 
@@ -104,7 +104,7 @@ contract ERC721Test is DSTest {
   }
 
   function testMintAlreadyMinted() public {
-    vm.expectRevert("ERC721::_mint: token already minted");
+    vm.expectRevert("ERC721: token already minted");
     token.mint(owner, 0);
   }
 
@@ -112,9 +112,9 @@ contract ERC721Test is DSTest {
   function testBurn() public {
     token.burn(0);
     assertEq(token.balanceOf(owner), 0);
-    vm.expectRevert("ERC721::ownerOf: query for nonexistent token");
+    vm.expectRevert("ERC721: query for nonexistent token");
     assertEq(token.ownerOf(0), address(0));
-    vm.expectRevert("ERC721::getApproved: query for nonexistent token");
+    vm.expectRevert("ERC721: query for nonexistent token");
     token.getApproved(0);
   }
 
@@ -127,14 +127,58 @@ contract ERC721Test is DSTest {
 
   function testSetApprovalForAllToCaller() public {
     vm.startPrank(owner);
-    vm.expectRevert("ERC721::_setApprovalForAll: approve to caller");
+    vm.expectRevert("ERC721: approve to caller");
     token.setApprovalForAll(owner, true);
   }
 
   // approve
   function testApproveToOwner() public {
     vm.startPrank(owner);
-    vm.expectRevert("ERC721::approve: approval to current owner");
+    vm.expectRevert("ERC721: approval to current owner");
     token.approve(owner, 0);
+  }
+
+  function testTotalSupply() public {
+    assertEq(token.totalSupply(), nextId);
+    token.mint(owner, nextId++);
+    assertEq(token.totalSupply(), nextId);
+  }
+
+  // tokenOfOwnerByIndex
+  function testTokenOfOwnerByIndex() public {
+    assertEq(token.tokenOfOwnerByIndex(owner, 0), 0);
+    token.mint(owner, nextId++);
+    assertEq(token.tokenOfOwnerByIndex(owner, 1), nextId - 1);
+    token.mint(other, nextId++);
+    assertEq(token.tokenOfOwnerByIndex(other, 0), nextId - 1);
+  }
+
+  function testTokenOfOwnerByIndexOutOfBounds() public {
+    vm.expectRevert("ERC721Enumerable: Index out of bounds");
+    token.tokenOfOwnerByIndex(owner, 1);
+  }
+
+  // tokenByIndex
+  function testTokenByIndex() public {
+    assertEq(token.tokenByIndex(0), 0);
+  }
+
+  function testTokenByIndexOutOfBounds() public {
+    vm.expectRevert("ERC721Enumerable: Index out of bounds");
+    token.tokenByIndex(1);
+  }
+
+  // tokensOfOwner
+  function testTokensOfOwner() public {
+    uint256[] memory wallet = token.tokensOfOwner(owner);
+    assertEq(wallet.length, 1);
+    assertEq(wallet[0], 0);
+
+    token.mint(owner, nextId);
+    wallet = token.tokensOfOwner(owner);
+    assertEq(wallet.length, 2);
+    assertEq(wallet[0], 0);
+    assertEq(wallet[1], 1);
+
   }
 }
