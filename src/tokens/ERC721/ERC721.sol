@@ -12,8 +12,6 @@ import "@openzeppelin/contracts/utils/Strings.sol";
 /**
  * @title ERC721
  * @author naomsa <https://twitter.com/naomsa666>
- * @notice An upgradable and gas-efficient ERC1721 standard contract modified
- * from the original OpenZeppelin implementation.
  */
 abstract contract ERC721 is ERC165, IERC721, IERC721Metadata {
   using Address for address;
@@ -164,7 +162,7 @@ abstract contract ERC721 is ERC165, IERC721, IERC721Metadata {
     address to,
     uint256 tokenId
   ) public virtual override {
-    safeTransferFrom(from, to, tokenId, new bytes(0));
+    safeTransferFrom(from, to, tokenId, "");
   }
 
   /// @notice See {IERC721-safeTransferFrom}.
@@ -268,7 +266,7 @@ abstract contract ERC721 is ERC165, IERC721, IERC721Metadata {
    * Emits a {Transfer} event.
    */
   function _safeMint(address to, uint256 tokenId) internal virtual {
-    _safeMint(to, tokenId, new bytes(0));
+    _safeMint(to, tokenId, "");
   }
 
   /**

@@ -11,8 +11,6 @@ import "@openzeppelin/contracts/utils/Strings.sol";
 /**
  * @title ERC1155
  * @author naomsa <https://twitter.com/naomsa666>
- * @notice An upgradable ERC1155 standard contract modified from the original
- * OpenZeppelin implementation.
  */
 abstract contract ERC1155 is ERC165, IERC1155, IERC1155MetadataURI {
   using Address for address;
@@ -298,7 +296,7 @@ abstract contract ERC1155 is ERC165, IERC1155, IERC1155MetadataURI {
       address(0),
       _asSingletonArray(id),
       _asSingletonArray(amount),
-      new bytes(0)
+      ""
     );
 
     require(
@@ -334,7 +332,7 @@ abstract contract ERC1155 is ERC165, IERC1155, IERC1155MetadataURI {
       address(0),
       ids,
       amounts,
-      new bytes(0)
+      ""
     );
 
     for (uint256 i = 0; i < ids.length; i++) {

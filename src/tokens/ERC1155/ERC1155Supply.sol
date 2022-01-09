@@ -6,8 +6,6 @@ import "./ERC1155.sol";
 /**
  * @title ERC1155 Supply
  * @author naomsa <https://twitter.com/naomsa666>
- * @notice Extension of ERC1155 that adds supply tracking features. Extended from
- * the original OpenZeppelin contract.
  */
 abstract contract ERC1155Supply is ERC1155 {
   /*         _           _            */

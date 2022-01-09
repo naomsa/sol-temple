@@ -10,8 +10,6 @@ import "./ERC1155.sol";
 /**
  * @title ERC1155 Permit
  * @author naomsa <https://twitter.com/naomsa666>
- * @notice Extension of ERC1155 that implements EIP-4494 for cheaper transactions
- * making approve transactions off-chain and gasless.
  */
 abstract contract ERC1155Permit is IERC1155Permit, ERC1155 {
   using ECDSA for bytes32;

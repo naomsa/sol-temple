@@ -10,8 +10,6 @@ import "./ERC721.sol";
 /**
  * @title ERC721 Permit
  * @author naomsa <https://twitter.com/naomsa666>
- * @notice Extension of ERC721 that implements EIP-4494 for cheaper transactions
- * making approve transactions off-chain and gasless.
  */
 abstract contract ERC721Permit is IERC721Permit, ERC721 {
   using ECDSA for bytes32;

@@ -7,8 +7,6 @@ import "./ERC721.sol";
 /**
  * @title ERC721Enumerable
  * @author naomsa <https://twitter.com/naomsa666>
- * @notice An upgradable and gas-efficient ERC1721 (enumerable) extension contract modified
- * from the original OpenZeppelin implementation.
  */
 abstract contract ERC721Enumerable is ERC721, IERC721Enumerable {
   /*   _                            */
