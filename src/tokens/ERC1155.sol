@@ -34,11 +34,7 @@ abstract contract ERC1155 {
   );
 
   /// @notice MUST emit when approval for a second party/operator address to manage all tokens for an owner address is enabled or disabled (absence of an event assumes disabled).
-  event ApprovalForAll(
-    address indexed _owner,
-    address indexed _operator,
-    bool _approved
-  );
+  event ApprovalForAll(address indexed _owner, address indexed _operator, bool _approved);
 
   /// @notice MUST emit when the URI is updated for a token ID.
   event URI(string _value, uint256 indexed _id);
@@ -80,10 +76,7 @@ abstract contract ERC1155 {
     virtual
     returns (uint256[] memory)
   {
-    require(
-      accounts.length == ids.length,
-      "ERC1155: accounts and ids length mismatch"
-    );
+    require(accounts.length == ids.length, "ERC1155: accounts and ids length mismatch");
 
     uint256[] memory batchBalances = new uint256[](accounts.length);
 
@@ -111,10 +104,7 @@ abstract contract ERC1155 {
     uint256 amount,
     bytes memory data
   ) public virtual {
-    require(
-      from == msg.sender || isApprovedForAll[from][msg.sender],
-      "ERC1155: caller is not owner nor approved"
-    );
+    require(from == msg.sender || isApprovedForAll[from][msg.sender], "ERC1155: caller is not owner nor approved");
     _safeTransferFrom(from, to, id, amount, data);
   }
 
@@ -166,26 +156,11 @@ abstract contract ERC1155 {
   ) internal virtual {
     require(to != address(0), "ERC1155: transfer to the zero address");
 
-    _trackSupplyBeforeTransfer(
-      from,
-      to,
-      _asSingletonArray(id),
-      _asSingletonArray(amount)
-    );
+    _trackSupplyBeforeTransfer(from, to, _asSingletonArray(id), _asSingletonArray(amount));
 
-    _beforeTokenTransfer(
-      msg.sender,
-      from,
-      to,
-      _asSingletonArray(id),
-      _asSingletonArray(amount),
-      data
-    );
+    _beforeTokenTransfer(msg.sender, from, to, _asSingletonArray(id), _asSingletonArray(amount), data);
 
-    require(
-      balanceOf[from][id] >= amount,
-      "ERC1155: insufficient balance for transfer"
-    );
+    require(balanceOf[from][id] >= amount, "ERC1155: insufficient balance for transfer");
     unchecked {
       balanceOf[from][id] -= amount;
     }
@@ -211,10 +186,7 @@ abstract contract ERC1155 {
     uint256[] memory amounts,
     bytes memory data
   ) internal virtual {
-    require(
-      ids.length == amounts.length,
-      "ERC1155: ids and amounts length mismatch"
-    );
+    require(ids.length == amounts.length, "ERC1155: ids and amounts length mismatch");
     require(to != address(0), "ERC1155: transfer to the zero address");
 
     _trackSupplyBeforeTransfer(from, to, ids, amounts);
@@ -222,10 +194,7 @@ abstract contract ERC1155 {
     _beforeTokenTransfer(msg.sender, from, to, ids, amounts, data);
 
     for (uint256 i = 0; i < ids.length; ++i) {
-      require(
-        balanceOf[from][ids[i]] >= amounts[i],
-        "ERC1155: insufficient balance for transfer"
-      );
+      require(balanceOf[from][ids[i]] >= amounts[i], "ERC1155: insufficient balance for transfer");
       unchecked {
         balanceOf[from][ids[i]] -= amounts[i];
       }
@@ -254,21 +223,9 @@ abstract contract ERC1155 {
   ) internal virtual {
     require(to != address(0), "ERC1155: mint to the zero address");
 
-    _trackSupplyBeforeTransfer(
-      address(0),
-      to,
-      _asSingletonArray(id),
-      _asSingletonArray(amount)
-    );
+    _trackSupplyBeforeTransfer(address(0), to, _asSingletonArray(id), _asSingletonArray(amount));
 
-    _beforeTokenTransfer(
-      msg.sender,
-      address(0),
-      to,
-      _asSingletonArray(id),
-      _asSingletonArray(amount),
-      data
-    );
+    _beforeTokenTransfer(msg.sender, address(0), to, _asSingletonArray(id), _asSingletonArray(amount), data);
 
     balanceOf[to][id] += amount;
     emit TransferSingle(msg.sender, address(0), to, id, amount);
@@ -291,10 +248,7 @@ abstract contract ERC1155 {
     bytes memory data
   ) internal virtual {
     require(to != address(0), "ERC1155: mint to the zero address");
-    require(
-      ids.length == amounts.length,
-      "ERC1155: ids and amounts length mismatch"
-    );
+    require(ids.length == amounts.length, "ERC1155: ids and amounts length mismatch");
 
     _trackSupplyBeforeTransfer(address(0), to, ids, amounts);
 
@@ -306,14 +260,7 @@ abstract contract ERC1155 {
 
     emit TransferBatch(msg.sender, address(0), to, ids, amounts);
 
-    _checkOnERC1155BatchReceived(
-      msg.sender,
-      address(0),
-      to,
-      ids,
-      amounts,
-      data
-    );
+    _checkOnERC1155BatchReceived(msg.sender, address(0), to, ids, amounts, data);
   }
 
   /**
@@ -327,26 +274,11 @@ abstract contract ERC1155 {
     uint256 id,
     uint256 amount
   ) internal virtual {
-    _trackSupplyBeforeTransfer(
-      from,
-      address(0),
-      _asSingletonArray(id),
-      _asSingletonArray(amount)
-    );
+    _trackSupplyBeforeTransfer(from, address(0), _asSingletonArray(id), _asSingletonArray(amount));
 
-    _beforeTokenTransfer(
-      msg.sender,
-      from,
-      address(0),
-      _asSingletonArray(id),
-      _asSingletonArray(amount),
-      ""
-    );
+    _beforeTokenTransfer(msg.sender, from, address(0), _asSingletonArray(id), _asSingletonArray(amount), "");
 
-    require(
-      balanceOf[from][id] >= amount,
-      "ERC1155: burn amount exceeds balance"
-    );
+    require(balanceOf[from][id] >= amount, "ERC1155: burn amount exceeds balance");
     unchecked {
       balanceOf[from][id] -= amount;
     }
@@ -365,20 +297,14 @@ abstract contract ERC1155 {
     uint256[] memory ids,
     uint256[] memory amounts
   ) internal virtual {
-    require(
-      ids.length == amounts.length,
-      "ERC1155: ids and amounts length mismatch"
-    );
+    require(ids.length == amounts.length, "ERC1155: ids and amounts length mismatch");
 
     _trackSupplyBeforeTransfer(from, address(0), ids, amounts);
 
     _beforeTokenTransfer(msg.sender, from, address(0), ids, amounts, "");
 
     for (uint256 i = 0; i < ids.length; i++) {
-      require(
-        balanceOf[from][ids[i]] >= amounts[i],
-        "ERC1155: burn amount exceeds balance"
-      );
+      require(balanceOf[from][ids[i]] >= amounts[i], "ERC1155: burn amount exceeds balance");
       unchecked {
         balanceOf[from][ids[i]] -= amounts[i];
       }
@@ -452,13 +378,8 @@ abstract contract ERC1155 {
     bytes memory data
   ) private {
     if (to.code.length > 0) {
-      try
-        IERC1155Receiver(to).onERC1155Received(operator, from, id, amount, data)
-      returns (bytes4 returnValue) {
-        require(
-          returnValue == 0xf23a6e61,
-          "ERC1155: transfer to non ERC1155Receiver implementer"
-        );
+      try IERC1155Receiver(to).onERC1155Received(operator, from, id, amount, data) returns (bytes4 returnValue) {
+        require(returnValue == 0xf23a6e61, "ERC1155: transfer to non ERC1155Receiver implementer");
       } catch {
         revert("ERC1155: transfer to non ERC1155Receiver implementer");
       }
@@ -474,30 +395,15 @@ abstract contract ERC1155 {
     bytes memory data
   ) private {
     if (to.code.length > 0) {
-      try
-        IERC1155Receiver(to).onERC1155BatchReceived(
-          operator,
-          from,
-          ids,
-          amounts,
-          data
-        )
-      returns (bytes4 returnValue) {
-        require(
-          returnValue == 0xbc197c81,
-          "ERC1155: transfer to non ERC1155Receiver implementer"
-        );
+      try IERC1155Receiver(to).onERC1155BatchReceived(operator, from, ids, amounts, data) returns (bytes4 returnValue) {
+        require(returnValue == 0xbc197c81, "ERC1155: transfer to non ERC1155Receiver implementer");
       } catch {
         revert("ERC1155: transfer to non ERC1155Receiver implementer");
       }
     }
   }
 
-  function _asSingletonArray(uint256 element)
-    private
-    pure
-    returns (uint256[] memory)
-  {
+  function _asSingletonArray(uint256 element) private pure returns (uint256[] memory) {
     uint256[] memory array = new uint256[](1);
     array[0] = element;
 
@@ -514,12 +420,7 @@ abstract contract ERC1155 {
   /**
    * @notice See {IERC165-supportsInterface}.
    */
-  function supportsInterface(bytes4 interfaceId)
-    public
-    view
-    virtual
-    returns (bool)
-  {
+  function supportsInterface(bytes4 interfaceId) public view virtual returns (bool) {
     return
       interfaceId == 0xd9b67a26 || // ERC1155
       interfaceId == 0x0e89341c || // ERC1155MetadataURI

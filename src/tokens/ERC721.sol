@@ -16,25 +16,13 @@ abstract contract ERC721 {
   /*  (____/`\__)`\__,_)`\__)`\____)  */
 
   /// @dev This emits when ownership of any NFT changes by any mechanism.
-  event Transfer(
-    address indexed _from,
-    address indexed _to,
-    uint256 indexed _tokenId
-  );
+  event Transfer(address indexed _from, address indexed _to, uint256 indexed _tokenId);
 
   /// @dev This emits when the approved address for an NFT is changed or
-  event Approval(
-    address indexed _owner,
-    address indexed _approved,
-    uint256 indexed _tokenId
-  );
+  event Approval(address indexed _owner, address indexed _approved, uint256 indexed _tokenId);
 
   /// @dev This emits when an operator is enabled or disabled for an owner.
-  event ApprovalForAll(
-    address indexed _owner,
-    address indexed _operator,
-    bool _approved
-  );
+  event ApprovalForAll(address indexed _owner, address indexed _operator, bool _approved);
 
   /// @notice See {IERC721Metadata-name}.
   string public name;
@@ -116,10 +104,7 @@ abstract contract ERC721 {
     address to,
     uint256 tokenId
   ) public virtual {
-    require(
-      _isApprovedOrOwner(msg.sender, tokenId),
-      "ERC721: transfer caller is not owner nor approved"
-    );
+    require(_isApprovedOrOwner(msg.sender, tokenId), "ERC721: transfer caller is not owner nor approved");
     _transfer(from, to, tokenId);
   }
 
@@ -139,23 +124,13 @@ abstract contract ERC721 {
     uint256 tokenId,
     bytes memory data_
   ) public virtual {
-    require(
-      _isApprovedOrOwner(msg.sender, tokenId),
-      "ERC721: transfer caller is not owner nor approved"
-    );
+    require(_isApprovedOrOwner(msg.sender, tokenId), "ERC721: transfer caller is not owner nor approved");
     _safeTransfer(from, to, tokenId, data_);
   }
 
   /// @notice See {IERC721Enumerable.tokenOfOwnerByIndex}.
-  function tokenOfOwnerByIndex(address owner, uint256 index)
-    public
-    view
-    returns (uint256 tokenId)
-  {
-    require(
-      index < ERC721.balanceOf(owner),
-      "ERC721Enumerable: Index out of bounds"
-    );
+  function tokenOfOwnerByIndex(address owner, uint256 index) public view returns (uint256 tokenId) {
+    require(index < ERC721.balanceOf(owner), "ERC721Enumerable: Index out of bounds");
     uint256 count;
     for (uint256 i; i < _owners.length; ++i) {
       if (owner == _owners[i]) {
@@ -239,17 +214,10 @@ abstract contract ERC721 {
    * Requirements:
    * - `tokenId` must exist.
    */
-  function _isApprovedOrOwner(address spender, uint256 tokenId)
-    internal
-    view
-    virtual
-    returns (bool)
-  {
+  function _isApprovedOrOwner(address spender, uint256 tokenId) internal view virtual returns (bool) {
     require(_exists(tokenId), "ERC721: query for nonexistent token");
     address owner = ERC721.ownerOf(tokenId);
-    return (spender == owner ||
-      getApproved(tokenId) == spender ||
-      isApprovedForAll[owner][spender]);
+    return (spender == owner || getApproved(tokenId) == spender || isApprovedForAll[owner][spender]);
   }
 
   /**
@@ -331,10 +299,7 @@ abstract contract ERC721 {
     address to,
     uint256 tokenId
   ) internal virtual {
-    require(
-      ERC721.ownerOf(tokenId) == from,
-      "ERC721: transfer of token that is not own"
-    );
+    require(ERC721.ownerOf(tokenId) == from, "ERC721: transfer of token that is not own");
 
     _beforeTokenTransfer(from, to, tokenId);
 
@@ -386,13 +351,8 @@ abstract contract ERC721 {
     bytes memory data
   ) private {
     if (to.code.length > 0) {
-      try
-        IERC721Receiver(to).onERC721Received(msg.sender, from, tokenId, data)
-      returns (bytes4 returned) {
-        require(
-          returned == 0x150b7a02,
-          "ERC721: safe transfer to non ERC721Receiver implementation"
-        );
+      try IERC721Receiver(to).onERC721Received(msg.sender, from, tokenId, data) returns (bytes4 returned) {
+        require(returned == 0x150b7a02, "ERC721: safe transfer to non ERC721Receiver implementation");
       } catch (bytes memory reason) {
         if (reason.length == 0) {
           revert("ERC721: safe transfer to non ERC721Receiver implementation");
@@ -430,12 +390,7 @@ abstract contract ERC721 {
   /*               (_)                  */
 
   /// @notice See {IERC165-supportsInterface}.
-  function supportsInterface(bytes4 interfaceId)
-    public
-    view
-    virtual
-    returns (bool)
-  {
+  function supportsInterface(bytes4 interfaceId) public view virtual returns (bool) {
     return
       interfaceId == 0x80ac58cd || // ERC721
       interfaceId == 0x5b5e139f || // ERC721Metadata
