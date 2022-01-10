@@ -3,17 +3,17 @@ pragma solidity >=0.8.0 <0.9.0;
 
 import "ds-test/test.sol";
 import "./vm.sol";
-import "./mocks/StorageMock.sol";
+import "./mocks/AuthMock.sol";
 
 contract AuthTest is DSTest {
   Vm vm = Vm(0x7109709ECfa91a80626fF3989D68f67F5b1DD12D);
-  StorageMock mock;
+  AuthMock mock;
 
   address owner = address(1);
   address other = address(2);
 
   function setUp() public {
-    mock = new StorageMock();
+    mock = new AuthMock();
   }
 
   // constructor
