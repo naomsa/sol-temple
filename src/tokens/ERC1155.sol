@@ -1,9 +1,11 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-pragma solidity ^0.8.0;
+pragma solidity >=0.8.0 <0.9.0;
 
 /**
  * @title ERC1155
  * @author naomsa <https://twitter.com/naomsa666>
+ * @notice A complete ERC1155 implementation including supply tracking and
+ * enumerable functions. Completely gas optimized and extensible.
  */
 abstract contract ERC1155 {
   /*         _           _            */
@@ -164,6 +166,13 @@ abstract contract ERC1155 {
   ) internal virtual {
     require(to != address(0), "ERC1155: transfer to the zero address");
 
+    _trackSupplyBeforeTransfer(
+      from,
+      to,
+      _asSingletonArray(id),
+      _asSingletonArray(amount)
+    );
+
     _beforeTokenTransfer(
       msg.sender,
       from,
@@ -208,6 +217,8 @@ abstract contract ERC1155 {
     );
     require(to != address(0), "ERC1155: transfer to the zero address");
 
+    _trackSupplyBeforeTransfer(from, to, ids, amounts);
+
     _beforeTokenTransfer(msg.sender, from, to, ids, amounts, data);
 
     for (uint256 i = 0; i < ids.length; ++i) {
@@ -242,6 +253,13 @@ abstract contract ERC1155 {
     bytes memory data
   ) internal virtual {
     require(to != address(0), "ERC1155: mint to the zero address");
+
+    _trackSupplyBeforeTransfer(
+      address(0),
+      to,
+      _asSingletonArray(id),
+      _asSingletonArray(amount)
+    );
 
     _beforeTokenTransfer(
       msg.sender,
@@ -278,6 +296,8 @@ abstract contract ERC1155 {
       "ERC1155: ids and amounts length mismatch"
     );
 
+    _trackSupplyBeforeTransfer(address(0), to, ids, amounts);
+
     _beforeTokenTransfer(msg.sender, address(0), to, ids, amounts, data);
 
     for (uint256 i = 0; i < ids.length; i++) {
@@ -307,6 +327,13 @@ abstract contract ERC1155 {
     uint256 id,
     uint256 amount
   ) internal virtual {
+    _trackSupplyBeforeTransfer(
+      from,
+      address(0),
+      _asSingletonArray(id),
+      _asSingletonArray(amount)
+    );
+
     _beforeTokenTransfer(
       msg.sender,
       from,
@@ -342,6 +369,8 @@ abstract contract ERC1155 {
       ids.length == amounts.length,
       "ERC1155: ids and amounts length mismatch"
     );
+
+    _trackSupplyBeforeTransfer(from, address(0), ids, amounts);
 
     _beforeTokenTransfer(msg.sender, from, address(0), ids, amounts, "");
 
@@ -393,7 +422,14 @@ abstract contract ERC1155 {
     uint256[] memory ids,
     uint256[] memory amounts,
     bytes memory data
-  ) internal virtual {
+  ) internal virtual {}
+
+  function _trackSupplyBeforeTransfer(
+    address from,
+    address to,
+    uint256[] memory ids,
+    uint256[] memory amounts
+  ) private {
     if (from == address(0)) {
       for (uint256 i = 0; i < ids.length; i++) {
         totalSupply[ids[i]] += amounts[i];

@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-pragma solidity ^0.8.0;
+pragma solidity >=0.8.0 <0.9.0;
 
 /**
  * @title ERC721
  * @author naomsa <https://twitter.com/naomsa666>
- * @notice A complete ERC721 implementation including metadata and
- * enumerable functions. Gas optimized and extensible.
+ * @notice A complete ERC721 implementation including metadata and enumerable
+ * functions. Completely gas optimized and extensible.
  */
-contract ERC721 {
+abstract contract ERC721 {
   /*         _           _            */
   /*        ( )_        ( )_          */
   /*    ___ | ,_)   _ _ | ,_)   __    */
