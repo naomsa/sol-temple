@@ -45,12 +45,12 @@ abstract contract Pausable {
   /*               \___/'           */
 
   /// @notice Retrieve contracts pause state.
-  function paused() public view virtual returns (bool) {
+  function paused() public view returns (bool) {
     return _paused;
   }
 
   /// @notice Inverts pause state. Declared internal so it can be combined with the Auth contract.
-  function _togglePaused() internal virtual {
+  function _togglePaused() internal {
     _paused = !_paused;
     if (_paused) emit Unpaused(msg.sender);
     else emit Paused(msg.sender);

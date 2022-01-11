@@ -23,6 +23,9 @@ contract Proxy is Auth {
 
   /// @notice Set the new implementation.
   function setImplementation(address implementation_) public onlyAuthorized {
+    require(implementation_ != address(0), "Proxy: upgrading to the zero address");
+    require(implementation_ != _implementation, "Proxy: upgrading to the current implementation");
+
     address oldImplementation = _implementation;
     _implementation = implementation_;
 
@@ -38,7 +41,7 @@ contract Proxy is Auth {
    * @notice Fallback function that delegates calls to the address returned by `_implementation()`. Will run if no other
    * function in the contract matches the call data.
    */
-  fallback() external payable virtual {
+  fallback() external payable {
     _beforeFallback();
     _delegate(_implementation);
   }
@@ -47,13 +50,13 @@ contract Proxy is Auth {
    * @notice Fallback function that delegates calls to the address returned by `_implementation()`. Will run if no other
    * function in the contract matches the call data.
    */
-  receive() external payable virtual {
+  receive() external payable {
     _beforeFallback();
     _delegate(_implementation);
   }
 
   /// @notice Delegate the current call to `implementation_`.
-  function _delegate(address implementation_) internal virtual {
+  function _delegate(address implementation_) internal {
     assembly {
       // Copy msg.data. We take full control of memory in this inline assembly
       // block because it will not return to Solidity code. We overwrite the
@@ -79,5 +82,5 @@ contract Proxy is Auth {
   }
 
   /// @notice Hook that is called before any delegation.
-  function _beforeFallback() internal virtual {}
+  function _beforeFallback() internal {}
 }

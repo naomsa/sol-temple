@@ -72,7 +72,11 @@ abstract contract Auth {
   /// @notice Set the owner address to `owner_`.
   function transferOwnership(address owner_) public onlyOwner {
     require(_owner != owner_, "Auth: transfering ownership to current owner");
+    _transferOwnership(owner_);
+  }
 
+  /// @notice Set the owner address to `owner_`. Does not require anything
+  function _transferOwnership(address owner_) internal {
     address oldOwner = _owner;
     _owner = owner_;
 
