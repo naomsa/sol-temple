@@ -8,6 +8,22 @@ pragma solidity >=0.8.0 <0.9.0;
  * function calls to other addresses as well as control the contract by his own.
  */
 abstract contract Auth {
+  /*         _           _            */
+  /*        ( )_        ( )_          */
+  /*    ___ | ,_)   _ _ | ,_)   __    */
+  /*  /',__)| |   /'_` )| |   /'__`\  */
+  /*  \__, \| |_ ( (_| || |_ (  ___/  */
+  /*  (____/`\__)`\__,_)`\__)`\____)  */
+
+  /// @notice Emited when the ownership is transfered.
+  event OwnershipTransfered(address indexed from, address indexed to);
+
+  /// @notice Emited a new call with `data` is authorized to `to`.
+  event AuthorizationGranted(address indexed to, bytes data);
+
+  /// @notice Emited a new call with `data` is forbidden to `to`.
+  event AuthorizationForbidden(address indexed to, bytes data);
+  
   /// @notice Contract's owner address.
   address private _owner;
 
@@ -30,6 +46,15 @@ abstract contract Auth {
     _;
   }
 
+  /*   _                            */
+  /*  (_ )                _         */
+  /*   | |    _      __  (_)   ___  */
+  /*   | |  /'_`\  /'_ `\| | /'___) */
+  /*   | | ( (_) )( (_) || |( (___  */
+  /*  (___)`\___/'`\__  |(_)`\____) */
+  /*              ( )_) |           */
+  /*               \___/'           */
+
   constructor() {
     _owner = msg.sender;
   }
@@ -45,7 +70,11 @@ abstract contract Auth {
   /// @notice Set the owner address to `owner_`.
   function transferOwnership(address owner_) public onlyOwner {
     require(_owner != owner_, "Auth: transfering ownership to current owner");
+
+    address oldOwner = _owner;
     _owner = owner_;
+
+    emit OwnershipTransfered(oldOwner, owner_);
   }
 
   /// @notice Authorize a call with `data_` to the address `to_`.
@@ -53,11 +82,15 @@ abstract contract Auth {
     require(to_ != _owner, "Auth: authorizing call to the owner");
     require(!_isAuthorized[to_][data_], "Auth: authorized calls cannot be authed");
     _isAuthorized[to_][data_] = true;
+
+    emit AuthorizationGranted(to_, data_);
   }
 
   /// @notice Authorize a call with `data_` to the address `to_`.
   function forbid(address to_, bytes memory data_) public onlyOwner {
     require(_isAuthorized[to_][data_], "Auth: unauthorized calls cannot be forbidden");
     delete _isAuthorized[to_][data_];
+
+    emit AuthorizationForbidden(to_, data_);
   }
 }
