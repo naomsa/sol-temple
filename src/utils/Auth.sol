@@ -4,8 +4,8 @@ pragma solidity >=0.8.0 <0.9.0;
 /**
  * @title Auth
  * @author naomsa <https://twitter.com/naomsa666>
- * @notice A simple but powerful authing system where the `owner` can authorize
- * function calls to other addresses as well as control the contract by his own.
+ * @notice Authing system where the `owner` can authorize function calls
+ * to other addresses as well as control the contract by his own.
  */
 abstract contract Auth {
   /*         _           _            */
@@ -23,7 +23,7 @@ abstract contract Auth {
 
   /// @notice Emited a new call with `data` is forbidden to `to`.
   event AuthorizationForbidden(address indexed to, bytes data);
-  
+
   /// @notice Contract's owner address.
   address private _owner;
 
@@ -56,13 +56,15 @@ abstract contract Auth {
   /*               \___/'           */
 
   constructor() {
-    _owner = msg.sender;
+    transferOwnership(msg.sender);
   }
 
+  /// @notice Returns the current contract owner.
   function owner() public view returns (address) {
     return _owner;
   }
 
+  /// @notice Retrieves whether `user_` is authorized to call with `data_`.
   function isAuthorized(address user_, bytes memory data_) public view returns (bool) {
     return user_ == _owner || _isAuthorized[user_][data_];
   }

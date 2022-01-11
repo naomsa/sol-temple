@@ -4,7 +4,7 @@ pragma solidity >=0.8.0 <0.9.0;
 /**
  * @title Pausable
  * @author naomsa <https://twitter.com/naomsa666>
- * @notice A simpler pausable contract.
+ * @notice Freeze your contract with a secure paused mechanism.
  */
 abstract contract Pausable {
   /*         _           _            */
@@ -45,14 +45,14 @@ abstract contract Pausable {
   /*               \___/'           */
 
   /// @notice Retrieve contracts pause state.
-  function paused() public view returns (bool) {
+  function paused() public view virtual returns (bool) {
     return _paused;
   }
 
   /// @notice Inverts pause state. Declared internal so it can be combined with the Auth contract.
-  function _togglePaused() internal {
+  function _togglePaused() internal virtual {
     _paused = !_paused;
-    if(_paused) emit Unpaused(msg.sender);
+    if (_paused) emit Unpaused(msg.sender);
     else emit Paused(msg.sender);
   }
 }
