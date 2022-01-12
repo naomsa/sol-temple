@@ -31,7 +31,10 @@ abstract contract ERC721 {
   string public symbol;
 
   /// @notice Array of all owners.
-  address[] internal _owners;
+  address[] private _owners;
+
+  /// @notice Mapping of all balances.
+  mapping(address => uint256) private _balanceOf;
 
   /// @notice Mapping from token ID to approved address.
   mapping(uint256 => address) internal _tokenApprovals;
@@ -56,12 +59,7 @@ abstract contract ERC721 {
   /// @notice See {IERC721-balanceOf}.
   function balanceOf(address owner) public view virtual returns (uint256) {
     require(owner != address(0), "ERC721: balance query for the zero address");
-
-    uint256 balance;
-    for (uint256 i = 0; i < _owners.length; i++) {
-      if (owner == _owners[i]) balance++;
-    }
-    return balance;
+    return _balanceOf[owner];
   }
 
   /// @notice See {IERC721-ownerOf}.
@@ -72,11 +70,11 @@ abstract contract ERC721 {
   }
 
   /// @notice See {IERC721Metadata-tokenURI}.
-  function tokenURI(uint256) public view virtual returns (string memory) {}
+  function tokenURI(uint256) public view virtual returns (string memory);
 
   /// @notice See {IERC721-approve}.
   function approve(address to, uint256 tokenId) public virtual {
-    address owner = ERC721.ownerOf(tokenId);
+    address owner = ownerOf(tokenId);
     require(to != owner, "ERC721: approval to current owner");
 
     require(
@@ -130,7 +128,7 @@ abstract contract ERC721 {
 
   /// @notice See {IERC721Enumerable.tokenOfOwnerByIndex}.
   function tokenOfOwnerByIndex(address owner, uint256 index) public view returns (uint256 tokenId) {
-    require(index < ERC721.balanceOf(owner), "ERC721Enumerable: Index out of bounds");
+    require(index < balanceOf(owner), "ERC721Enumerable: Index out of bounds");
     uint256 count;
     for (uint256 i; i < _owners.length; ++i) {
       if (owner == _owners[i]) {
@@ -216,7 +214,7 @@ abstract contract ERC721 {
    */
   function _isApprovedOrOwner(address spender, uint256 tokenId) internal view virtual returns (bool) {
     require(_exists(tokenId), "ERC721: query for nonexistent token");
-    address owner = ERC721.ownerOf(tokenId);
+    address owner = _owners[tokenId];
     return (spender == owner || getApproved(tokenId) == spender || isApprovedForAll[owner][spender]);
   }
 
@@ -259,7 +257,11 @@ abstract contract ERC721 {
     require(!_exists(tokenId), "ERC721: token already minted");
 
     _beforeTokenTransfer(address(0), to, tokenId);
+
     _owners.push(to);
+    unchecked {
+      _balanceOf[to]++;
+    }
 
     emit Transfer(address(0), to, tokenId);
   }
@@ -274,13 +276,14 @@ abstract contract ERC721 {
    * Emits a {Transfer} event.
    */
   function _burn(uint256 tokenId) internal virtual {
-    address owner = ERC721.ownerOf(tokenId);
+    address owner = ownerOf(tokenId);
 
     _beforeTokenTransfer(owner, address(0), tokenId);
 
     // Clear approvals
     _approve(address(0), tokenId);
     delete _owners[tokenId];
+    _balanceOf[owner]--;
 
     emit Transfer(owner, address(0), tokenId);
   }
@@ -299,13 +302,18 @@ abstract contract ERC721 {
     address to,
     uint256 tokenId
   ) internal virtual {
-    require(ERC721.ownerOf(tokenId) == from, "ERC721: transfer of token that is not own");
+    require(_owners[tokenId] == from, "ERC721: transfer of token that is not own");
 
     _beforeTokenTransfer(from, to, tokenId);
 
     // Clear approvals from the previous owner
     _approve(address(0), tokenId);
+
     _owners[tokenId] = to;
+    unchecked {
+      _balanceOf[from]--;
+      _balanceOf[to]++;
+    }
 
     emit Transfer(from, to, tokenId);
   }
@@ -317,7 +325,7 @@ abstract contract ERC721 {
    */
   function _approve(address to, uint256 tokenId) internal virtual {
     _tokenApprovals[tokenId] = to;
-    emit Approval(ERC721.ownerOf(tokenId), to, tokenId);
+    emit Approval(_owners[tokenId], to, tokenId);
   }
 
   /**
