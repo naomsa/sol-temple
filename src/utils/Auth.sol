@@ -56,7 +56,7 @@ abstract contract Auth {
   /*               \___/'           */
 
   constructor() {
-    transferOwnership(msg.sender);
+    _transferOwnership(msg.sender);
   }
 
   /// @notice Returns the current contract owner.
