@@ -37,10 +37,10 @@ abstract contract ERC721 {
   mapping(address => uint256) private _balanceOf;
 
   /// @notice Mapping from token ID to approved address.
-  mapping(uint256 => address) internal _tokenApprovals;
+  mapping(uint256 => address) private _tokenApprovals;
 
-  /// @notice See {IERC721-isApprovedForAll}.
-  mapping(address => mapping(address => bool)) public isApprovedForAll;
+  /// @notice Mapping of approvals between owner and operator.
+  mapping(address => mapping(address => bool)) private _isApprovedForAll;
 
   /*   _                            */
   /*  (_ )                _         */
@@ -78,7 +78,7 @@ abstract contract ERC721 {
     require(to != owner, "ERC721: approval to current owner");
 
     require(
-      msg.sender == owner || isApprovedForAll[owner][msg.sender],
+      msg.sender == owner || _isApprovedForAll[owner][msg.sender],
       "ERC721: caller is not owner nor approved for all"
     );
 
@@ -94,6 +94,11 @@ abstract contract ERC721 {
   /// @notice See {IERC721-setApprovalForAll}.
   function setApprovalForAll(address operator, bool approved) public virtual {
     _setApprovalForAll(msg.sender, operator, approved);
+  }
+
+  /// @notice See {IERC721-isApprovedForAll}
+  function isApprovedForAll(address owner, address operator) public view virtual returns (bool) {
+    return _isApprovedForAll[owner][operator];
   }
 
   /// @notice See {IERC721-transferFrom}.
@@ -215,7 +220,7 @@ abstract contract ERC721 {
   function _isApprovedOrOwner(address spender, uint256 tokenId) internal view virtual returns (bool) {
     require(_exists(tokenId), "ERC721: query for nonexistent token");
     address owner = _owners[tokenId];
-    return (spender == owner || getApproved(tokenId) == spender || isApprovedForAll[owner][spender]);
+    return (spender == owner || getApproved(tokenId) == spender || _isApprovedForAll[owner][spender]);
   }
 
   /**
@@ -339,7 +344,7 @@ abstract contract ERC721 {
     bool approved
   ) internal virtual {
     require(owner != operator, "ERC721: approve to caller");
-    isApprovedForAll[owner][operator] = approved;
+    _isApprovedForAll[owner][operator] = approved;
     emit ApprovalForAll(owner, operator, approved);
   }
 
