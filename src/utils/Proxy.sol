@@ -37,6 +37,11 @@ contract Proxy is Auth {
     return _implementation;
   }
 
+  /// @notice Retrieve proxy type. Always returns 2 since this is of upgradable type.
+  function proxyType() public pure returns (uint256) {
+    return 2;
+  }
+
   /**
    * @notice Fallback function that delegates calls to the address returned by `_implementation()`. Will run if no other
    * function in the contract matches the call data.
