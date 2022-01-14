@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity >=0.8.0 <0.9.0;
 
-import "../../tokens/ERC1155.sol";
+import "../../tokens/ERC1155Upgradable.sol";
 
-contract ERC1155Mock is ERC1155 {
+contract ERC1155UpgradableMock is ERC1155Upgradable {
   function uri(uint256) public pure override returns (string memory) {
     return "";
   }

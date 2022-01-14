@@ -15,7 +15,7 @@ contract Proxy is Auth {
   event Upgraded(address indexed from, address indexed to);
 
   /// @notice Current implementation address.
-  address internal _implementation;
+  address private _implementation;
 
   constructor(address implementation_) {
     setImplementation(implementation_);

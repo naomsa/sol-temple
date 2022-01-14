@@ -1,13 +1,15 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 pragma solidity >=0.8.0 <0.9.0;
 
+import "../utils/Auth.sol";
+
 /**
  * @title ERC1155
  * @author naomsa <https://twitter.com/naomsa666>
  * @notice A complete ERC1155 implementation including supply tracking and
- * enumerable functions. Completely gas optimized and extensible.
+ * enumerable functions. Completely gas optimized and extensible. Must be deployed with Proxy
  */
-abstract contract ERC1155 {
+abstract contract ERC1155Upgradable is Auth {
   /*         _           _            */
   /*        ( )_        ( )_          */
   /*    ___ | ,_)   _ _ | ,_)   __    */
@@ -38,6 +40,9 @@ abstract contract ERC1155 {
 
   /// @notice MUST emit when the URI is updated for a token ID.
   event URI(string _value, uint256 indexed _id);
+
+  /// @notice Reserved #1 slot.
+  address private _implementation;
 
   /// @notice See {IERC1155-balanceOf}.
   mapping(address => mapping(uint256 => uint256)) public balanceOf;
