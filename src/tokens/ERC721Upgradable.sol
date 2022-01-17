@@ -2,7 +2,7 @@
 pragma solidity >=0.8.0 <0.9.0;
 
 /**
- * @title ERC721
+ * @title ERC721 Upgradable
  * @author naomsa <https://twitter.com/naomsa666>
  * @notice A complete ERC721 implementation including metadata and enumerable
  * functions. Completely gas optimized and extensible.
