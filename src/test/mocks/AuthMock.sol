@@ -6,7 +6,7 @@ import "../../utils/Auth.sol";
 contract AuthMock is Auth {
   uint256 public number;
 
-  function store(uint256 num) public onlyAuthorized {
+  function store(uint256 num) public onlyOwner {
     number = num;
   }
 

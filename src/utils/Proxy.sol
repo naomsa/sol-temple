@@ -22,7 +22,7 @@ contract Proxy is Auth {
   }
 
   /// @notice Set the new implementation.
-  function setImplementation(address implementation_) public onlyAuthorized {
+  function setImplementation(address implementation_) public onlyOwner {
     require(implementation_ != address(0), "Proxy: upgrading to the zero address");
     require(implementation_ != _implementation, "Proxy: upgrading to the current implementation");
 
