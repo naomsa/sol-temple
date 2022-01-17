@@ -24,7 +24,7 @@ contract ERC721UpgradableTest is DSTest {
     token = ERC721UpgradableMock(address(proxy));
 
     // Do required action(s)
-    token.intitialize("Token", "TKN");
+    token.inititialize("Token", "TKN");
 
     token.mint(owner, 0);
     nextId = 1;
@@ -179,7 +179,7 @@ contract ERC721UpgradableTest is DSTest {
   function testSetImplementation() public {
     ERC721UpgradableMock newToken = new ERC721UpgradableMock();
     proxy.setImplementation(address(newToken));
-    token.intitialize("Token2", "TKN2");
+    token.inititialize("Token2", "TKN2");
 
     assertEq(proxy.implementation(), address(newToken));
     assertEq(token.name(), "Token2");

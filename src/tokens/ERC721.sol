@@ -17,28 +17,22 @@ abstract contract ERC721 {
 
   /// @notice See {ERC721-Transfer}.
   event Transfer(address indexed _from, address indexed _to, uint256 indexed _tokenId);
-
   /// @notice See {ERC721-Approval}.
   event Approval(address indexed _owner, address indexed _approved, uint256 indexed _tokenId);
-
   /// @notice See {ERC721-ApprovalForAll}.
   event ApprovalForAll(address indexed _owner, address indexed _operator, bool _approved);
 
   /// @notice See {ERC721Metadata-name}.
   string public name;
-
   /// @notice See {ERC721Metadata-symbol}.
   string public symbol;
 
   /// @notice Array of all owners.
   address[] private _owners;
-
   /// @notice Mapping of all balances.
   mapping(address => uint256) private _balanceOf;
-
   /// @notice Mapping from token Id to it's approved address.
   mapping(uint256 => address) private _tokenApprovals;
-
   /// @notice Mapping of approvals between owner and operator.
   mapping(address => mapping(address => bool)) private _isApprovedForAll;
 
