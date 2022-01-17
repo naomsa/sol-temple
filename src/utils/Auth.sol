@@ -15,17 +15,17 @@ abstract contract Auth {
   /*  \__, \| |_ ( (_| || |_ (  ___/  */
   /*  (____/`\__)`\__,_)`\__)`\____)  */
 
-  /// @notice Emited when the ownership is transfered.
+  /// @notice Emitted when the ownership is transfered.
   event OwnershipTransfered(address indexed from, address indexed to);
 
-  /// @notice Emited a new call with `data` is authorized to `to`.
+  /// @notice Emitted a new call with `data` is authorized to `to`.
   event AuthorizationGranted(address indexed to, bytes data);
 
-  /// @notice Emited a new call with `data` is forbidden to `to`.
+  /// @notice Emitted a new call with `data` is forbidden to `to`.
   event AuthorizationForbidden(address indexed to, bytes data);
 
   /// @notice Contract's owner address.
-  address private _owner;
+  address public owner;
 
   /// @notice A mapping to retrieve if a call data was authed and is valid for the address.
   mapping(address => mapping(bytes => bool)) private _isAuthorized;
@@ -37,12 +37,12 @@ abstract contract Auth {
   modifier onlyAuthorized() {
     require(isAuthorized(msg.sender, msg.data), "Auth: sender is not the owner or authorized to call");
     _;
-    if (msg.sender != _owner) _isAuthorized[msg.sender][msg.data] = false;
+    if (msg.sender != owner) _isAuthorized[msg.sender][msg.data] = false;
   }
 
   /// @notice A simple modifier just to check whether the sender is the owner.
   modifier onlyOwner() {
-    require(msg.sender == _owner, "Auth: sender is not the owner");
+    require(msg.sender == owner, "Auth: sender is not the owner");
     _;
   }
 
@@ -59,33 +59,28 @@ abstract contract Auth {
     _transferOwnership(msg.sender);
   }
 
-  /// @notice Returns the current contract owner.
-  function owner() public view returns (address) {
-    return _owner;
-  }
-
   /// @notice Retrieves whether `user_` is authorized to call with `data_`.
   function isAuthorized(address user_, bytes memory data_) public view returns (bool) {
-    return user_ == _owner || _isAuthorized[user_][data_];
+    return user_ == owner || _isAuthorized[user_][data_];
   }
 
   /// @notice Set the owner address to `owner_`.
   function transferOwnership(address owner_) public onlyOwner {
-    require(_owner != owner_, "Auth: transfering ownership to current owner");
+    require(owner != owner_, "Auth: transfering ownership to current owner");
     _transferOwnership(owner_);
   }
 
   /// @notice Set the owner address to `owner_`. Does not require anything
   function _transferOwnership(address owner_) internal {
-    address oldOwner = _owner;
-    _owner = owner_;
+    address oldOwner = owner;
+    owner = owner_;
 
     emit OwnershipTransfered(oldOwner, owner_);
   }
 
   /// @notice Authorize a call with `data_` to the address `to_`.
   function auth(address to_, bytes memory data_) public onlyOwner {
-    require(to_ != _owner, "Auth: authorizing call to the owner");
+    require(to_ != owner, "Auth: authorizing call to the owner");
     require(!_isAuthorized[to_][data_], "Auth: authorized calls cannot be authed");
     _isAuthorized[to_][data_] = true;
 

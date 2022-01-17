@@ -6,12 +6,12 @@ import "./Auth.sol";
 /**
  * @title Proxy
  * @author naomsa <https://twitter.com/naomsa666>
- * @notice An upgradable proxy util for function delegation.
+ * @notice An upgradable proxy util for function delegation following EIP-897.
  * @dev The implementaion MUST reserve the first two storage slots to the
  * `_owner` address and the `_implementation` address.
  */
 contract Proxy is Auth {
-  /// @notice Emited when a new implementation is set.
+  /// @notice Emitted when a new implementation is set.
   event Upgraded(address indexed from, address indexed to);
 
   /// @notice Current implementation address.
@@ -32,12 +32,12 @@ contract Proxy is Auth {
     emit Upgraded(oldImplementation, implementation_);
   }
 
-  /// @notice Retrieve the current implementation.
+  /// @notice See {EIP897-implementation}.
   function implementation() public view returns (address) {
     return _implementation;
   }
 
-  /// @notice Retrieve proxy type. Always returns 2 since this is of upgradable type.
+  /// @notice See {EIP897-proxyType}.
   function proxyType() public pure returns (uint256) {
     return 2;
   }

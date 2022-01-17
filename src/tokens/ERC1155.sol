@@ -15,7 +15,7 @@ abstract contract ERC1155 {
   /*  \__, \| |_ ( (_| || |_ (  ___/  */
   /*  (____/`\__)`\__,_)`\__)`\____)  */
 
-  /// @notice Emited on single transfers.
+  /// @notice See {ERC1155-TransferSingle}.
   event TransferSingle(
     address indexed _operator,
     address indexed _from,
@@ -24,7 +24,7 @@ abstract contract ERC1155 {
     uint256 _value
   );
 
-  /// @notice Emited on batch transfers.
+  /// @notice See {ERC1155-TransferBatch}.
   event TransferBatch(
     address indexed _operator,
     address indexed _from,
@@ -33,19 +33,19 @@ abstract contract ERC1155 {
     uint256[] _values
   );
 
-  /// @notice Emited when a a new approval is made.
+  /// @notice See {ERC1155-ApprovalForAll}.
   event ApprovalForAll(address indexed _owner, address indexed _operator, bool _approved);
 
-  /// @notice MUST emit when the URI is updated for a token ID.
+  /// @notice See {ERC1155-URI}.
   event URI(string _value, uint256 indexed _id);
 
-  /// @notice See {IERC1155-balanceOf}.
+  /// @notice See {ERC1155-balanceOf}.
   mapping(address => mapping(uint256 => uint256)) public balanceOf;
 
-  /// @notice See {IERC1155-isApprovedForAll}.
+  /// @notice See {ERC1155-isApprovedForAll}.
   mapping(address => mapping(address => bool)) public isApprovedForAll;
 
-  /// @notice See {IERC1155Supple-totalSupply}
+  /// @notice Tracker for tokens in circulation by Id.
   mapping(uint256 => uint256) public totalSupply;
 
   /*   _                            */
@@ -57,19 +57,10 @@ abstract contract ERC1155 {
   /*              ( )_) |           */
   /*               \___/'           */
 
-  /**
-   * @notice See {IERC1155MetadataURI-uri}.
-   * This implementation returns the same URI for *all* token types. It relies
-   * on the token type ID substitution mechanism e.g. https://token-cdn-domain/{id}.json
-   */
+  /// @notice See {ERC1155Metadata_URI-uri}.
   function uri(uint256) public view virtual returns (string memory);
 
-  /**
-   * @notice See {IERC1155-balanceOfBatch}.
-   *
-   * Requirements:
-   * - `accounts` and `ids` must have the same length.
-   */
+  /// @notice See {ERC1155-balanceOfBatch}.
   function balanceOfBatch(address[] memory accounts, uint256[] memory ids)
     public
     view
@@ -87,16 +78,12 @@ abstract contract ERC1155 {
     return batchBalances;
   }
 
-  /**
-   * @notice See {IERC1155-setApprovalForAll}.
-   */
+  /// @notice See {ERC1155-setApprovalForAll}.
   function setApprovalForAll(address operator, bool approved) public virtual {
     _setApprovalForAll(msg.sender, operator, approved);
   }
 
-  /**
-   * @notice See {IERC1155-safeTransferFrom}.
-   */
+  /// @notice See {ERC1155-safeTransferFrom}.
   function safeTransferFrom(
     address from,
     address to,
@@ -108,9 +95,7 @@ abstract contract ERC1155 {
     _safeTransferFrom(from, to, id, amount, data);
   }
 
-  /**
-   * @notice See {IERC1155-safeBatchTransferFrom}.
-   */
+  /// @notice See {ERC1155-safeBatchTransferFrom}.
   function safeBatchTransferFrom(
     address from,
     address to,
@@ -137,16 +122,7 @@ abstract contract ERC1155 {
   /*  | || ( ) || |_ (  ___/| |   | ( ) |( (_| | | |  */
   /*  (_)(_) (_)`\__)`\____)(_)   (_) (_)`\__,_)(___) */
 
-  /**
-   * @notice Transfers `amount` tokens of token type `id` from `from` to `to`.
-   * Emits a {TransferSingle} event.
-   *
-   * Requirements:
-   * - `to` cannot be the zero address.
-   * - `from` must have a balance of tokens of type `id` of at least `amount`.
-   * - If `to` refers to a smart contract, it must implement {IERC1155Receiver-onERC1155Received} and return the
-   * acceptance magic value.
-   */
+  /// @notice Transfers `amount` tokens of token type `id` from `from` to `to`.
   function _safeTransferFrom(
     address from,
     address to,
@@ -171,14 +147,7 @@ abstract contract ERC1155 {
     _checkOnERC1155Received(msg.sender, from, to, id, amount, data);
   }
 
-  /**
-   * @notice Safe version of the batchTransferFrom function.
-   * Emits a {TransferBatch} event.
-   *
-   * Requirements:
-   * - If `to` refers to a smart contract, it must implement {IERC1155Receiver-onERC1155BatchReceived} and return the
-   * acceptance magic value.
-   */
+  /// @notice Safe version of the batchTransferFrom function.
   function _safeBatchTransferFrom(
     address from,
     address to,
@@ -206,15 +175,7 @@ abstract contract ERC1155 {
     _checkOnERC1155BatchReceived(msg.sender, from, to, ids, amounts, data);
   }
 
-  /**
-   * @notice Creates `amount` tokens of token type `id`, and assigns them to `to`.
-   * Emits a {TransferSingle} event.
-   *
-   * Requirements:
-   * - `to` cannot be the zero address.
-   * - If `to` refers to a smart contract, it must implement {IERC1155Receiver-onERC1155Received} and return the
-   * acceptance magic value.
-   */
+  /// @notice Creates `amount` tokens of token type `id`, and assigns them to `to`.
   function _mint(
     address to,
     uint256 id,
@@ -233,14 +194,7 @@ abstract contract ERC1155 {
     _checkOnERC1155Received(msg.sender, address(0), to, id, amount, data);
   }
 
-  /**
-   * @notice Batch version of {mint}.
-   *
-   * Requirements:
-   * - `ids` and `amounts` must have the same length.
-   * - If `to` refers to a smart contract, it must implement {IERC1155Receiver-onERC1155BatchReceived} and return the
-   * acceptance magic value.
-   */
+  /// @notice Batch version of {mint}.
   function _mintBatch(
     address to,
     uint256[] memory ids,
@@ -263,12 +217,7 @@ abstract contract ERC1155 {
     _checkOnERC1155BatchReceived(msg.sender, address(0), to, ids, amounts, data);
   }
 
-  /**
-   * @notice Destroys `amount` tokens of token type `id` from `from`
-   *
-   * Requirements:
-   * - `from` must have at least `amount` tokens of token type `id`.
-   */
+  /// @notice Destroys `amount` tokens of token type `id` from `from`
   function _burn(
     address from,
     uint256 id,
@@ -286,12 +235,7 @@ abstract contract ERC1155 {
     emit TransferSingle(msg.sender, from, address(0), id, amount);
   }
 
-  /**
-   * @notice Batch version of {burn}.
-   *
-   * Requirements:
-   * - `ids` and `amounts` must have the same length.
-   */
+  /// @notice Batch version of {burn}.
   function _burnBatch(
     address from,
     uint256[] memory ids,
@@ -313,10 +257,7 @@ abstract contract ERC1155 {
     emit TransferBatch(msg.sender, from, address(0), ids, amounts);
   }
 
-  /**
-   * @notice Approve `operator` to operate on all of `owner` tokens
-   * Emits a {ApprovalForAll} event.
-   */
+  /// @notice Approve `operator` to operate on all of `owner` tokens
   function _setApprovalForAll(
     address owner,
     address operator,
@@ -327,20 +268,7 @@ abstract contract ERC1155 {
     emit ApprovalForAll(owner, operator, approved);
   }
 
-  /**
-   * @notice Hook that is called before any token transfer. This includes minting
-   * and burning, as well as batched variants.
-   *
-   * Calling conditions (for each `id` and `amount` pair):
-   * - When `from` and `to` are both non-zero, `amount` of ``from``'s tokens
-   * of token type `id` will be  transferred to `to`.
-   * - When `from` is zero, `amount` tokens of token type `id` will be minted
-   * for `to`.
-   * - when `to` is zero, `amount` of ``from``'s tokens of token type `id`
-   * will be burned.
-   * - `from` and `to` are never both zero.
-   * - `ids` and `amounts` have the same, non-zero length.
-   */
+  /// @notice Hook that is called before any token transfer.
   function _beforeTokenTransfer(
     address operator,
     address from,
@@ -350,6 +278,7 @@ abstract contract ERC1155 {
     bytes memory data
   ) internal virtual {}
 
+  /// @notice Internal helper for tracking token supply before transfers.
   function _trackSupplyBeforeTransfer(
     address from,
     address to,
@@ -369,6 +298,7 @@ abstract contract ERC1155 {
     }
   }
 
+  /// @notice ERC1155Receiver callback checking and calling helper for single transfers.
   function _checkOnERC1155Received(
     address operator,
     address from,
@@ -386,6 +316,7 @@ abstract contract ERC1155 {
     }
   }
 
+  /// @notice ERC1155Receiver callback checking and calling helper for batch transfers.
   function _checkOnERC1155BatchReceived(
     address operator,
     address from,
@@ -403,6 +334,7 @@ abstract contract ERC1155 {
     }
   }
 
+  /// @notice Helper for single item arrays.
   function _asSingletonArray(uint256 element) private pure returns (uint256[] memory) {
     uint256[] memory array = new uint256[](1);
     array[0] = element;
@@ -417,9 +349,7 @@ abstract contract ERC1155 {
   /*               | |                  */
   /*               (_)                  */
 
-  /**
-   * @notice See {IERC165-supportsInterface}.
-   */
+  /// @notice See {IERC165-supportsInterface}.
   function supportsInterface(bytes4 interfaceId) public view virtual returns (bool) {
     return
       interfaceId == 0xd9b67a26 || // ERC1155

@@ -14,24 +14,24 @@ abstract contract Pausable {
   /*  \__, \| |_ ( (_| || |_ (  ___/  */
   /*  (____/`\__)`\__,_)`\__)`\____)  */
 
-  /// @notice Emited when the contract is paused.
+  /// @notice Emitted when the contract is paused.
   event Paused(address indexed by);
 
-  /// @notice Emited when the contract is unpaused.
+  /// @notice Emitted when the contract is unpaused.
   event Unpaused(address indexed by);
 
   /// @notice Read-only pause state.
-  bool private _paused;
+  bool public paused;
 
   /// @notice A modifier to be used when the contract must be paused.
   modifier onlyWhenPaused() {
-    require(_paused, "Pausable: contract not paused");
+    require(paused, "Pausable: contract not paused");
     _;
   }
 
   /// @notice A modifier to be used when the contract must be unpaused.
   modifier onlyWhenUnpaused() {
-    require(!_paused, "Pausable: contract paused");
+    require(!paused, "Pausable: contract paused");
     _;
   }
 
@@ -44,15 +44,10 @@ abstract contract Pausable {
   /*              ( )_) |           */
   /*               \___/'           */
 
-  /// @notice Retrieve contracts pause state.
-  function paused() public view returns (bool) {
-    return _paused;
-  }
-
   /// @notice Inverts pause state. Declared internal so it can be combined with the Auth contract.
   function _togglePaused() internal {
-    _paused = !_paused;
-    if (_paused) emit Unpaused(msg.sender);
-    else emit Paused(msg.sender);
+    paused = !paused;
+    if (paused) emit Paused(msg.sender);
+    else emit Unpaused(msg.sender);
   }
 }

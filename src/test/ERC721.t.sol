@@ -170,12 +170,12 @@ contract ERC721Test is DSTest {
 
   // tokensOfOwner
   function testTokensOfOwner() public {
-    uint256[] memory wallet = token.tokensOfOwner(owner);
+    uint256[] memory wallet = token.walletOfOwner(owner);
     assertEq(wallet.length, 1);
     assertEq(wallet[0], 0);
 
     token.mint(owner, nextId);
-    wallet = token.tokensOfOwner(owner);
+    wallet = token.walletOfOwner(owner);
     assertEq(wallet.length, 2);
     assertEq(wallet[0], 0);
     assertEq(wallet[1], 1);

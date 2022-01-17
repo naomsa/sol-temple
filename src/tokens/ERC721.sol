@@ -15,19 +15,19 @@ abstract contract ERC721 {
   /*  \__, \| |_ ( (_| || |_ (  ___/  */
   /*  (____/`\__)`\__,_)`\__)`\____)  */
 
-  /// @dev This emits when ownership of any NFT changes by any mechanism.
+  /// @notice See {ERC721-Transfer}.
   event Transfer(address indexed _from, address indexed _to, uint256 indexed _tokenId);
 
-  /// @dev This emits when the approved address for an NFT is changed or
+  /// @notice See {ERC721-Approval}.
   event Approval(address indexed _owner, address indexed _approved, uint256 indexed _tokenId);
 
-  /// @dev This emits when an operator is enabled or disabled for an owner.
+  /// @notice See {ERC721-ApprovalForAll}.
   event ApprovalForAll(address indexed _owner, address indexed _operator, bool _approved);
 
-  /// @notice See {IERC721Metadata-name}.
+  /// @notice See {ERC721Metadata-name}.
   string public name;
 
-  /// @notice See {IERC721Metadata-symbol}.
+  /// @notice See {ERC721Metadata-symbol}.
   string public symbol;
 
   /// @notice Array of all owners.
@@ -36,7 +36,7 @@ abstract contract ERC721 {
   /// @notice Mapping of all balances.
   mapping(address => uint256) private _balanceOf;
 
-  /// @notice Mapping from token ID to approved address.
+  /// @notice Mapping from token Id to it's approved address.
   mapping(uint256 => address) private _tokenApprovals;
 
   /// @notice Mapping of approvals between owner and operator.
@@ -56,23 +56,23 @@ abstract contract ERC721 {
     symbol = symbol_;
   }
 
-  /// @notice See {IERC721-balanceOf}.
+  /// @notice See {ERC721-balanceOf}.
   function balanceOf(address owner) public view virtual returns (uint256) {
     require(owner != address(0), "ERC721: balance query for the zero address");
     return _balanceOf[owner];
   }
 
-  /// @notice See {IERC721-ownerOf}.
+  /// @notice See {ERC721-ownerOf}.
   function ownerOf(uint256 tokenId) public view virtual returns (address) {
     require(_exists(tokenId), "ERC721: query for nonexistent token");
     address owner = _owners[tokenId];
     return owner;
   }
 
-  /// @notice See {IERC721Metadata-tokenURI}.
+  /// @notice See {ERC721Metadata-tokenURI}.
   function tokenURI(uint256) public view virtual returns (string memory);
 
-  /// @notice See {IERC721-approve}.
+  /// @notice See {ERC721-approve}.
   function approve(address to, uint256 tokenId) public virtual {
     address owner = ownerOf(tokenId);
     require(to != owner, "ERC721: approval to current owner");
@@ -85,23 +85,23 @@ abstract contract ERC721 {
     _approve(to, tokenId);
   }
 
-  /// @notice See {IERC721-getApproved}.
+  /// @notice See {ERC721-getApproved}.
   function getApproved(uint256 tokenId) public view virtual returns (address) {
     require(_exists(tokenId), "ERC721: query for nonexistent token");
     return _tokenApprovals[tokenId];
   }
 
-  /// @notice See {IERC721-setApprovalForAll}.
+  /// @notice See {ERC721-setApprovalForAll}.
   function setApprovalForAll(address operator, bool approved) public virtual {
     _setApprovalForAll(msg.sender, operator, approved);
   }
 
-  /// @notice See {IERC721-isApprovedForAll}
+  /// @notice See {ERC721-isApprovedForAll}
   function isApprovedForAll(address owner, address operator) public view virtual returns (bool) {
     return _isApprovedForAll[owner][operator];
   }
 
-  /// @notice See {IERC721-transferFrom}.
+  /// @notice See {ERC721-transferFrom}.
   function transferFrom(
     address from,
     address to,
@@ -111,7 +111,7 @@ abstract contract ERC721 {
     _transfer(from, to, tokenId);
   }
 
-  /// @notice See {IERC721-safeTransferFrom}.
+  /// @notice See {ERC721-safeTransferFrom}.
   function safeTransferFrom(
     address from,
     address to,
@@ -120,7 +120,7 @@ abstract contract ERC721 {
     safeTransferFrom(from, to, tokenId, "");
   }
 
-  /// @notice See {IERC721-safeTransferFrom}.
+  /// @notice See {ERC721-safeTransferFrom}.
   function safeTransferFrom(
     address from,
     address to,
@@ -131,7 +131,7 @@ abstract contract ERC721 {
     _safeTransfer(from, to, tokenId, data_);
   }
 
-  /// @notice See {IERC721Enumerable.tokenOfOwnerByIndex}.
+  /// @notice See {ERC721Enumerable.tokenOfOwnerByIndex}.
   function tokenOfOwnerByIndex(address owner, uint256 index) public view returns (uint256 tokenId) {
     require(index < balanceOf(owner), "ERC721Enumerable: Index out of bounds");
     uint256 count;
@@ -144,19 +144,19 @@ abstract contract ERC721 {
     revert("ERC721Enumerable: Index out of bounds");
   }
 
-  /// @notice See {IERC721Enumerable.totalSupply}.
+  /// @notice See {ERC721Enumerable.totalSupply}.
   function totalSupply() public view virtual returns (uint256) {
     return _owners.length;
   }
 
-  /// @notice See {IERC721Enumerable.tokenByIndex}.
+  /// @notice See {ERC721Enumerable.tokenByIndex}.
   function tokenByIndex(uint256 index) public view virtual returns (uint256) {
     require(index < _owners.length, "ERC721Enumerable: Index out of bounds");
     return index;
   }
 
   /// @notice Returns a list of all token Ids owned by `owner`.
-  function tokensOfOwner(address owner) public view returns (uint256[] memory) {
+  function walletOfOwner(address owner) public view returns (uint256[] memory) {
     uint256 balance = balanceOf(owner);
     uint256[] memory ids = new uint256[](balance);
     for (uint256 i = 0; i < balance; i++) {
@@ -175,19 +175,6 @@ abstract contract ERC721 {
   /**
    * @notice Safely transfers `tokenId` token from `from` to `to`, checking first that contract recipients
    * are aware of the ERC721 protocol to prevent tokens from being forever locked.
-   *
-   * `data_` is additional data, it has no specified format and it is sent in call to `to`.
-   *
-   * This internal function is equivalent to {safeTransferFrom}, and can be used to e.g.
-   * implement alternative mechanisms to perform token transfer, such as signature-based.
-   *
-   * Requirements:
-   * - `from` cannot be the zero address.
-   * - `to` cannot be the zero address.
-   * - `tokenId` token must exist and be owned by `from`.
-   * - If `to` refers to a smart contract, it must implement {IERC721Receiver-onERC721Received}, which is called upon a safe transfer.
-   *
-   * Emits a {Transfer} event.
    */
   function _safeTransfer(
     address from,
@@ -199,46 +186,26 @@ abstract contract ERC721 {
     _checkOnERC721Received(from, to, tokenId, data_);
   }
 
-  /**
-   * @notice Returns whether `tokenId` exists.
-   *
-   * Tokens can be managed by their owner or approved accounts via {approve} or {setApprovalForAll}.
-   *
-   * Tokens start existing when they are minted (`_mint`),
-   * and stop existing when they are burned (`_burn`).
-   */
+  /// @notice Returns whether `tokenId` exists.
   function _exists(uint256 tokenId) internal view virtual returns (bool) {
     return tokenId < _owners.length && _owners[tokenId] != address(0);
   }
 
-  /**
-   * @notice Returns whether `spender` is allowed to manage `tokenId`.
-   *
-   * Requirements:
-   * - `tokenId` must exist.
-   */
+  /// @notice Returns whether `spender` is allowed to manage `tokenId`.
   function _isApprovedOrOwner(address spender, uint256 tokenId) internal view virtual returns (bool) {
     require(_exists(tokenId), "ERC721: query for nonexistent token");
     address owner = _owners[tokenId];
     return (spender == owner || getApproved(tokenId) == spender || _isApprovedForAll[owner][spender]);
   }
 
-  /**
-   * @notice Safely mints `tokenId` and transfers it to `to`.
-   *
-   * Requirements:
-   * - `tokenId` must not exist.
-   * - If `to` refers to a smart contract, it must implement {IERC721Receiver-onERC721Received}, which is called upon a safe transfer.
-   *
-   * Emits a {Transfer} event.
-   */
+  /// @notice Safely mints `tokenId` and transfers it to `to`.
   function _safeMint(address to, uint256 tokenId) internal virtual {
     _safeMint(to, tokenId, "");
   }
 
   /**
    * @notice Same as {_safeMint}, but with an additional `data` parameter which is
-   * forwarded in {IERC721Receiver-onERC721Received} to contract recipients.
+   * forwarded in {ERC721Receiver-onERC721Received} to contract recipients.
    */
   function _safeMint(
     address to,
@@ -249,15 +216,7 @@ abstract contract ERC721 {
     _checkOnERC721Received(address(0), to, tokenId, data_);
   }
 
-  /**
-   * @notice Mints `tokenId` and transfers it to `to`.
-   *
-   * Requirements:
-   * - `tokenId` must not exist.
-   * - `to` cannot be the zero address.
-   *
-   * Emits a {Transfer} event.
-   */
+  /// @notice Mints `tokenId` and transfers it to `to`.
   function _mint(address to, uint256 tokenId) internal virtual {
     require(!_exists(tokenId), "ERC721: token already minted");
 
@@ -271,15 +230,7 @@ abstract contract ERC721 {
     emit Transfer(address(0), to, tokenId);
   }
 
-  /**
-   * @notice Destroys `tokenId`.
-   * The approval is cleared when the token is burned.
-   *
-   * Requirements:
-   * - `tokenId` must exist.
-   *
-   * Emits a {Transfer} event.
-   */
+  /// @notice Destroys `tokenId`. The approval is cleared when the token is burned.
   function _burn(uint256 tokenId) internal virtual {
     address owner = ownerOf(tokenId);
 
@@ -293,15 +244,7 @@ abstract contract ERC721 {
     emit Transfer(owner, address(0), tokenId);
   }
 
-  /**
-   * @notice Transfers `tokenId` from `from` to `to`.
-   *  As opposed to {transferFrom}, this imposes no restrictions on msg.sender.
-   *
-   * Requirements:
-   * - `tokenId` token must be owned by `from`.
-   *
-   * Emits a {Transfer} event.
-   */
+  /// @notice Transfers `tokenId` from `from` to `to`.
   function _transfer(
     address from,
     address to,
@@ -323,21 +266,13 @@ abstract contract ERC721 {
     emit Transfer(from, to, tokenId);
   }
 
-  /**
-   * @notice Approve `to` to operate on `tokenId`
-   *
-   * Emits a {Approval} event.
-   */
+  /// @notice Approve `to` to operate on `tokenId`
   function _approve(address to, uint256 tokenId) internal virtual {
     _tokenApprovals[tokenId] = to;
     emit Approval(_owners[tokenId], to, tokenId);
   }
 
-  /**
-   * @notice Approve `operator` to operate on all of `owner` tokens
-   *
-   * Emits a {ApprovalForAll} event.
-   */
+  /// @notice Approve `operator` to operate on all of `owner` tokens
   function _setApprovalForAll(
     address owner,
     address operator,
@@ -348,15 +283,7 @@ abstract contract ERC721 {
     emit ApprovalForAll(owner, operator, approved);
   }
 
-  /**
-   * @notice Internal function to invoke {IERC721Receiver-onERC721Received} on a target address.
-   * The call is not executed if the target address is not a contract.
-   *
-   * @param from address representing the previous owner of the given token ID
-   * @param to target address that will receive the tokens
-   * @param tokenId uint256 ID of the token to be transferred
-   * @param data bytes optional data to send along with the call
-   */
+  /// @notice ERC721Receiver callback checking and calling helper.
   function _checkOnERC721Received(
     address from,
     address to,
@@ -378,17 +305,7 @@ abstract contract ERC721 {
     }
   }
 
-  /**
-   * @notice Hook that is called before any token transfer. This includes minting
-   * and burning.
-   *
-   * Calling conditions:
-   * - When `from` and `to` are both non-zero, ``from``'s `tokenId` will be
-   * transferred to `to`.
-   * - When `from` is zero, `tokenId` will be minted for `to`.
-   * - When `to` is zero, ``from``'s `tokenId` will be burned.
-   * - `from` and `to` are never both zero.
-   */
+  /// @notice Hook that is called before any token transfer.
   function _beforeTokenTransfer(
     address from,
     address to,
