@@ -1,6 +1,6 @@
 {
   "name": "sol-temple",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "author": "naomsa <https://twitter.com/naomsa666>",
   "license": "GPL-3.0-or-later",
   "description": "A solidity temple for gas optimized and super efficient contracts. Built with Foundry's forge.",
