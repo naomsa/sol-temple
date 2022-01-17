@@ -30,10 +30,7 @@ abstract contract Auth {
   /// @notice A mapping to retrieve if a call data was authed and is valid for the address.
   mapping(address => mapping(bytes => bool)) private _isAuthorized;
 
-  /**
-   * @notice A modifier that requires the user to be the owner or authorization to call.
-   * After the call, the user loses it's authorization if he's not the owner.
-   */
+  /// @notice Requires the user to be the owner or authorized to call and delete is authorization.
   modifier onlyAuthorized() {
     require(isAuthorized(msg.sender, msg.data), "Auth: sender is not the owner or authorized to call");
     _;
