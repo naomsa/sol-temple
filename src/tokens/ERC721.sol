@@ -27,6 +27,9 @@ abstract contract ERC721 {
   /// @notice See {ERC721Metadata-symbol}.
   string public symbol;
 
+  /// @notice See {ERC721Enumerable-totalSupply}.
+  uint256 public totalSupply;
+
   /// @notice Array of all owners.
   address[] private _owners;
   /// @notice Mapping of all balances.
@@ -51,9 +54,9 @@ abstract contract ERC721 {
   }
 
   /// @notice See {ERC721-balanceOf}.
-  function balanceOf(address owner_) public view virtual returns (uint256) {
-    require(owner_ != address(0), "ERC721: balance query for the zero address");
-    return _balanceOf[owner_];
+  function balanceOf(address account_) public view virtual returns (uint256) {
+    require(account_ != address(0), "ERC721: balance query for the zero address");
+    return _balanceOf[account_];
   }
 
   /// @notice See {ERC721-ownerOf}.
@@ -121,21 +124,16 @@ abstract contract ERC721 {
   }
 
   /// @notice See {ERC721Enumerable.tokenOfOwnerByIndex}.
-  function tokenOfOwnerByIndex(address owner_, uint256 index_) public view returns (uint256 tokenId) {
-    require(index_ < balanceOf(owner_), "ERC721Enumerable: Index out of bounds");
+  function tokenOfOwnerByIndex(address account_, uint256 index_) public view returns (uint256 tokenId) {
+    require(index_ < balanceOf(account_), "ERC721Enumerable: Index out of bounds");
     uint256 count;
     for (uint256 i; i < _owners.length; ++i) {
-      if (owner_ == _owners[i]) {
+      if (account_ == _owners[i]) {
         if (count == index_) return i;
         else count++;
       }
     }
     revert("ERC721Enumerable: Index out of bounds");
-  }
-
-  /// @notice See {ERC721Enumerable.totalSupply}.
-  function totalSupply() public view virtual returns (uint256) {
-    return _owners.length;
   }
 
   /// @notice See {ERC721Enumerable.tokenByIndex}.
@@ -145,11 +143,11 @@ abstract contract ERC721 {
   }
 
   /// @notice Returns a list of all token Ids owned by `owner`.
-  function walletOfOwner(address owner_) public view returns (uint256[] memory) {
-    uint256 balance = balanceOf(owner_);
+  function walletOfOwner(address account_) public view returns (uint256[] memory) {
+    uint256 balance = balanceOf(account_);
     uint256[] memory ids = new uint256[](balance);
     for (uint256 i = 0; i < balance; i++) {
-      ids[i] = tokenOfOwnerByIndex(owner_, i);
+      ids[i] = tokenOfOwnerByIndex(account_, i);
     }
     return ids;
   }
@@ -212,6 +210,7 @@ abstract contract ERC721 {
     _beforeTokenTransfer(address(0), to_, tokenId_);
 
     _owners.push(to_);
+    totalSupply++;
     unchecked {
       _balanceOf[to_]++;
     }
@@ -228,6 +227,7 @@ abstract contract ERC721 {
     // Clear approvals
     _approve(address(0), tokenId_);
     delete _owners[tokenId_];
+    totalSupply--;
     _balanceOf[owner]--;
 
     emit Transfer(owner, address(0), tokenId_);
@@ -261,15 +261,15 @@ abstract contract ERC721 {
     emit Approval(_owners[tokenId_], to_, tokenId_);
   }
 
-  /// @notice Approve `operator_` to operate on all of `owner_` tokens.
+  /// @notice Approve `operator_` to operate on all of `account_` tokens.
   function _setApprovalForAll(
-    address owner_,
+    address account_,
     address operator_,
     bool approved_
   ) internal virtual {
-    require(owner_ != operator_, "ERC721: approve to caller");
-    isApprovedForAll[owner_][operator_] = approved_;
-    emit ApprovalForAll(owner_, operator_, approved_);
+    require(account_ != operator_, "ERC721: approve to caller");
+    isApprovedForAll[account_][operator_] = approved_;
+    emit ApprovalForAll(account_, operator_, approved_);
   }
 
   /// @notice ERC721Receiver callback checking and calling helper.

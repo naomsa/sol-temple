@@ -111,9 +111,14 @@ contract ERC721UpgradableTest is DSTest {
 
   function testBurn() public {
     token.burn(0);
+
     assertEq(token.balanceOf(owner), 0);
+
+    assertEq(token.totalSupply(), 0);
+
     vm.expectRevert("ERC721: query for nonexistent token");
     assertEq(token.ownerOf(0), address(0));
+
     vm.expectRevert("ERC721: query for nonexistent token");
     token.getApproved(0);
   }
