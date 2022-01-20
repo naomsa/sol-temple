@@ -41,8 +41,8 @@ abstract contract ERC721Upgradable {
   mapping(address => uint256) private _balanceOf;
   /// @notice Mapping from token Id to it's approved address.
   mapping(uint256 => address) private _tokenApprovals;
-  /// @notice See {ERC721-isApprovedForAll}.
-  mapping(address => mapping(address => bool)) public isApprovedForAll;
+  /// @notice Mapping of approvals between owner and operator.
+  mapping(address => mapping(address => bool)) public _isApprovedForAll;
 
   /*   _                            */
   /*  (_ )                _         */
@@ -80,7 +80,7 @@ abstract contract ERC721Upgradable {
     require(to_ != owner, "ERC721: approval to current owner");
 
     require(
-      msg.sender == owner || isApprovedForAll[owner][msg.sender],
+      msg.sender == owner || _isApprovedForAll[owner][msg.sender],
       "ERC721: caller is not owner nor approved for all"
     );
 
@@ -96,6 +96,11 @@ abstract contract ERC721Upgradable {
   /// @notice See {ERC721-setApprovalForAll}.
   function setApprovalForAll(address operator_, bool approved_) public virtual {
     _setApprovalForAll(msg.sender, operator_, approved_);
+  }
+
+  /// @notice See {ERC721-isApprovedForAll}.
+  function isApprovedForAll(address account_, address operator_) public view virtual returns (bool) {
+    return _isApprovedForAll[account_][operator_];
   }
 
   /// @notice See {ERC721-transferFrom}.
@@ -187,7 +192,7 @@ abstract contract ERC721Upgradable {
   function _isApprovedOrOwner(address spender_, uint256 tokenId_) internal view virtual returns (bool) {
     require(_exists(tokenId_), "ERC721: query for nonexistent token");
     address owner = _owners[tokenId_];
-    return (spender_ == owner || getApproved(tokenId_) == spender_ || isApprovedForAll[owner][spender_]);
+    return (spender_ == owner || getApproved(tokenId_) == spender_ || _isApprovedForAll[owner][spender_]);
   }
 
   /// @notice Safely mints `tokenId_` and transfers it to `to`.
@@ -273,7 +278,7 @@ abstract contract ERC721Upgradable {
     bool approved_
   ) internal virtual {
     require(account_ != operator_, "ERC721: approve to caller");
-    isApprovedForAll[account_][operator_] = approved_;
+    _isApprovedForAll[account_][operator_] = approved_;
     emit ApprovalForAll(account_, operator_, approved_);
   }
 
