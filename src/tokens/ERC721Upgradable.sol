@@ -42,7 +42,7 @@ abstract contract ERC721Upgradable {
   /// @notice Mapping from token Id to it's approved address.
   mapping(uint256 => address) private _tokenApprovals;
   /// @notice Mapping of approvals between owner and operator.
-  mapping(address => mapping(address => bool)) public _isApprovedForAll;
+  mapping(address => mapping(address => bool)) private _isApprovedForAll;
 
   /*   _                            */
   /*  (_ )                _         */
