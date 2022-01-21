@@ -1,13 +1,15 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 pragma solidity >=0.8.0 <0.9.0;
 
+import "../utils/Upgradable.sol";
+
 /**
  * @title ERC721 Upgradable
  * @author naomsa <https://twitter.com/naomsa666>
  * @notice A complete ERC721 implementation including metadata and enumerable
  * functions. Completely gas optimized and extensible.
  */
-abstract contract ERC721Upgradable {
+abstract contract ERC721Upgradable is Upgradable {
   /*         _           _            */
   /*        ( )_        ( )_          */
   /*    ___ | ,_)   _ _ | ,_)   __    */
@@ -21,11 +23,6 @@ abstract contract ERC721Upgradable {
   event Approval(address indexed _owner, address indexed _approved, uint256 indexed _tokenId);
   /// @notice See {ERC721-ApprovalForAll}.
   event ApprovalForAll(address indexed _owner, address indexed _operator, bool _approved);
-
-  /// @notice See {Auth-owner}.
-  address public owner;
-  /// @notice See {Proxy-_implementation}.
-  address private _implementation;
 
   /// @notice See {ERC721Metadata-name}.
   string public name;

@@ -1,13 +1,15 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 pragma solidity >=0.8.0 <0.9.0;
 
+import "../utils/Upgradable.sol";
+
 /**
  * @title ERC1155 Upgradable
  * @author naomsa <https://twitter.com/naomsa666>
  * @notice A complete ERC1155 implementation including supply tracking and
  * enumerable functions. Completely gas optimized and extensible.
  */
-abstract contract ERC1155Upgradable {
+abstract contract ERC1155Upgradable is Upgradable {
   /*         _           _            */
   /*        ( )_        ( )_          */
   /*    ___ | ,_)   _ _ | ,_)   __    */
@@ -36,11 +38,6 @@ abstract contract ERC1155Upgradable {
   /// @notice See {ERC1155-URI}.
   event URI(string _value, uint256 indexed _id);
 
-  /// @notice See {Auth-owner}.
-  address public owner;
-  /// @notice See {Proxy-_implementation}.
-  address private _implementation;
-
   /// @notice See {ERC1155-balanceOf}.
   mapping(address => mapping(uint256 => uint256)) public balanceOf;
   /// @notice See {ERC1155-isApprovedForAll}.
@@ -57,6 +54,8 @@ abstract contract ERC1155Upgradable {
   /*  (___)`\___/'`\__  |(_)`\____) */
   /*              ( )_) |           */
   /*               \___/'           */
+
+  function __ERC1155_init() internal {}
 
   /// @notice See {ERC1155Metadata_URI-uri}.
   function uri(uint256) public view virtual returns (string memory);

@@ -1,13 +1,15 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 pragma solidity >=0.8.0 <0.9.0;
 
+import "../utils/Upgradable.sol";
+
 /**
  * @title ERC20 Upgradable
  * @author naomsa <https://twitter.com/naomsa666>
  * @notice A complete ERC20 implementation including EIP-2612 permit feature.
  * Inspired by Solmate's ERC20, aiming at efficiency.
  */
-abstract contract ERC20Upgradable {
+abstract contract ERC20Upgradable is Upgradable {
   /*         _           _            */
   /*        ( )_        ( )_          */
   /*    ___ | ,_)   _ _ | ,_)   __    */
@@ -19,11 +21,6 @@ abstract contract ERC20Upgradable {
   event Transfer(address indexed from, address indexed to, uint256 value);
   /// @notice See {ERC20-Approval}.
   event Approval(address indexed owner, address indexed spender, uint256 value);
-
-  /// @notice See {Auth-owner}.
-  address public owner;
-  /// @notice See {Proxy-_implementation}.
-  address private _implementation;
 
   /// @notice See {ERC20-name}.
   string public name;
