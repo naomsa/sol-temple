@@ -1,11 +1,9 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity >=0.8.0 <0.9.0;
 
-import "../../utils/Auth.sol";
+import "../../utils/Upgradable.sol";
 
-contract ProxyMock is Auth {
-  address internal _implementation;
-
+contract ProxyMock is Upgradable {
   uint256 public number;
 
   function store(uint256 num) public {

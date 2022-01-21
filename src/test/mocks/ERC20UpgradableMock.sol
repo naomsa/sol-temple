@@ -1,14 +1,15 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity >=0.8.0 <0.9.0;
 
+import "../../utils/Upgradable.sol";
 import "../../tokens/ERC20Upgradable.sol";
 
-contract ERC20UpgradableMock is ERC20Upgradable {
+contract ERC20UpgradableMock is Upgradable, ERC20Upgradable {
   function initialize(
     string memory name,
     string memory symbol,
     uint8 decimals
-  ) external {
+  ) external onlyOwner {
     __ERC20_init(name, symbol, decimals);
   }
 

@@ -1,15 +1,13 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 pragma solidity >=0.8.0 <0.9.0;
 
-import "../utils/Upgradable.sol";
-
 /**
  * @title ERC1155 Upgradable
  * @author naomsa <https://twitter.com/naomsa666>
  * @notice A complete ERC1155 implementation including supply tracking and
  * enumerable functions. Completely gas optimized and extensible.
  */
-abstract contract ERC1155Upgradable is Upgradable {
+abstract contract ERC1155Upgradable {
   /*         _           _            */
   /*        ( )_        ( )_          */
   /*    ___ | ,_)   _ _ | ,_)   __    */
