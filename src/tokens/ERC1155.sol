@@ -23,7 +23,6 @@ abstract contract ERC1155 {
     uint256 _id,
     uint256 _value
   );
-
   /// @notice See {ERC1155-TransferBatch}.
   event TransferBatch(
     address indexed _operator,
@@ -32,19 +31,15 @@ abstract contract ERC1155 {
     uint256[] _ids,
     uint256[] _values
   );
-
   /// @notice See {ERC1155-ApprovalForAll}.
   event ApprovalForAll(address indexed _owner, address indexed _operator, bool _approved);
-
   /// @notice See {ERC1155-URI}.
   event URI(string _value, uint256 indexed _id);
 
   /// @notice See {ERC1155-balanceOf}.
   mapping(address => mapping(uint256 => uint256)) public balanceOf;
-
   /// @notice See {ERC1155-isApprovedForAll}.
   mapping(address => mapping(address => bool)) public isApprovedForAll;
-
   /// @notice Tracker for tokens in circulation by Id.
   mapping(uint256 => uint256) public totalSupply;
 
@@ -143,8 +138,8 @@ abstract contract ERC1155 {
     balanceOf[to][id] += amount;
 
     emit TransferSingle(msg.sender, from, to, id, amount);
-
     _checkOnERC1155Received(msg.sender, from, to, id, amount, data);
+    _afterTokenTransfer(msg.sender, from, to, _asSingletonArray(id), _asSingletonArray(amount), data);
   }
 
   /// @notice Safe version of the batchTransferFrom function.
@@ -171,8 +166,8 @@ abstract contract ERC1155 {
     }
 
     emit TransferBatch(msg.sender, from, to, ids, amounts);
-
     _checkOnERC1155BatchReceived(msg.sender, from, to, ids, amounts, data);
+    _afterTokenTransfer(msg.sender, from, to, ids, amounts, data);
   }
 
   /// @notice Creates `amount` tokens of token type `id`, and assigns them to `to`.
@@ -190,8 +185,8 @@ abstract contract ERC1155 {
 
     balanceOf[to][id] += amount;
     emit TransferSingle(msg.sender, address(0), to, id, amount);
-
     _checkOnERC1155Received(msg.sender, address(0), to, id, amount, data);
+    _afterTokenTransfer(msg.sender, address(0), to, _asSingletonArray(id), _asSingletonArray(amount), data);
   }
 
   /// @notice Batch version of {mint}.
@@ -213,8 +208,8 @@ abstract contract ERC1155 {
     }
 
     emit TransferBatch(msg.sender, address(0), to, ids, amounts);
-
     _checkOnERC1155BatchReceived(msg.sender, address(0), to, ids, amounts, data);
+    _afterTokenTransfer(msg.sender, address(0), to, ids, amounts, data);
   }
 
   /// @notice Destroys `amount` tokens of token type `id` from `from`
@@ -233,6 +228,7 @@ abstract contract ERC1155 {
     }
 
     emit TransferSingle(msg.sender, from, address(0), id, amount);
+    _afterTokenTransfer(msg.sender, from, address(0), _asSingletonArray(id), _asSingletonArray(amount), "");
   }
 
   /// @notice Batch version of {burn}.
@@ -255,6 +251,7 @@ abstract contract ERC1155 {
     }
 
     emit TransferBatch(msg.sender, from, address(0), ids, amounts);
+    _afterTokenTransfer(msg.sender, from, address(0), ids, amounts, "");
   }
 
   /// @notice Approve `operator` to operate on all of `owner` tokens
@@ -270,6 +267,16 @@ abstract contract ERC1155 {
 
   /// @notice Hook that is called before any token transfer.
   function _beforeTokenTransfer(
+    address operator,
+    address from,
+    address to,
+    uint256[] memory ids,
+    uint256[] memory amounts,
+    bytes memory data
+  ) internal virtual {}
+
+  /// @notice Hook that is called after any token transfer.
+  function _afterTokenTransfer(
     address operator,
     address from,
     address to,

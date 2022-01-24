@@ -97,6 +97,46 @@ contract ERC721Test is DSTest {
     token.safeTransferFrom(other, owner, nextId);
   }
 
+  function testBeforeTransferHook() public {
+    token.mint(owner, 1);
+    (address from, address to, uint256 id) = abi.decode(token.beforeTransferData(), (address, address, uint256));
+    assertEq(from, address(0));
+    assertEq(to, owner);
+    assertEq(id, 1);
+
+    token.burn(1);
+    (from, to, id) = abi.decode(token.beforeTransferData(), (address, address, uint256));
+    assertEq(from, owner);
+    assertEq(to, address(0));
+    assertEq(id, 1);
+
+    token.transferFrom(owner, address(this), 0);
+    (from, to, id) = abi.decode(token.beforeTransferData(), (address, address, uint256));
+    assertEq(from, owner);
+    assertEq(to, address(this));
+    assertEq(id, 0);
+  }
+
+  function testAfterTransferHook() public {
+    token.mint(owner, 1);
+    (address from, address to, uint256 id) = abi.decode(token.afterTransferData(), (address, address, uint256));
+    assertEq(from, address(0));
+    assertEq(to, owner);
+    assertEq(id, 1);
+
+    token.burn(1);
+    (from, to, id) = abi.decode(token.afterTransferData(), (address, address, uint256));
+    assertEq(from, owner);
+    assertEq(to, address(0));
+    assertEq(id, 1);
+
+    token.transferFrom(owner, address(this), 0);
+    (from, to, id) = abi.decode(token.afterTransferData(), (address, address, uint256));
+    assertEq(from, owner);
+    assertEq(to, address(this));
+    assertEq(id, 0);
+  }
+
   // _mint
   function testMint() public {
     token.mint(owner, nextId);

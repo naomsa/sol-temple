@@ -133,6 +133,7 @@ abstract contract ERC20Upgradable {
     uint256 value_
   ) internal {
     require(balanceOf[from_] >= value_, "ERC20: insufficient balance");
+    _beforeTokenTransfer(from_, to_, value_);
 
     balanceOf[from_] -= value_;
     unchecked {
@@ -140,6 +141,7 @@ abstract contract ERC20Upgradable {
     }
 
     emit Transfer(from_, to_, value_);
+    _afterTokenTransfer(from_, to_, value_);
   }
 
   /// @notice Internal approve helper.
@@ -154,22 +156,28 @@ abstract contract ERC20Upgradable {
 
   /// @notice Internal minting logic.
   function _mint(address to_, uint256 value_) internal {
+    _beforeTokenTransfer(address(0), to_, value_);
+
     totalSupply += value_;
     unchecked {
       balanceOf[to_] += value_;
     }
 
     emit Transfer(address(0), to_, value_);
+    _afterTokenTransfer(address(0), to_, value_);
   }
 
   /// @notice Internal burning logic.
   function _burn(address from_, uint256 value_) internal {
+    _beforeTokenTransfer(from_, address(0), value_);
+
     balanceOf[from_] -= value_;
     unchecked {
       totalSupply -= value_;
     }
 
     emit Transfer(from_, address(0), value_);
+    _afterTokenTransfer(from_, address(0), value_);
   }
 
   /**
@@ -223,4 +231,16 @@ abstract contract ERC20Upgradable {
     }
     return result;
   }
+
+  function _beforeTokenTransfer(
+    address from,
+    address to,
+    uint256 value
+  ) internal virtual {}
+
+  function _afterTokenTransfer(
+    address from,
+    address to,
+    uint256 value
+  ) internal virtual {}
 }

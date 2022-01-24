@@ -5,6 +5,9 @@ import "../../utils/Upgradable.sol";
 import "../../tokens/ERC20Upgradable.sol";
 
 contract ERC20UpgradableMock is Upgradable, ERC20Upgradable {
+  bytes public beforeTransferData;
+  bytes public afterTransferData;
+
   function initialize(
     string memory name,
     string memory symbol,
@@ -19,5 +22,21 @@ contract ERC20UpgradableMock is Upgradable, ERC20Upgradable {
 
   function burn(address owner, uint256 value) external {
     _burn(owner, value);
+  }
+
+  function _beforeTokenTransfer(
+    address from,
+    address to,
+    uint256 value
+  ) internal override {
+    beforeTransferData = abi.encode(from, to, value);
+  }
+
+  function _afterTokenTransfer(
+    address from,
+    address to,
+    uint256 value
+  ) internal override {
+    afterTransferData = abi.encode(from, to, value);
   }
 }

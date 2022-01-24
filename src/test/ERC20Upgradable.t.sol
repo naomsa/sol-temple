@@ -106,6 +106,52 @@ contract ERC20UpgradableTest is DSTest {
     token.transferFrom(owner, address(this), 1e18);
   }
 
+  function testBeforeTransferHook() public {
+    token.mint(address(this), 1e18);
+
+    (address from, address to, uint256 value) = abi.decode(token.beforeTransferData(), (address, address, uint256));
+    assertEq(from, address(0));
+    assertEq(to, address(this));
+    assertEq(value, 1e18);
+
+    token.burn(address(this), 0.5e18);
+
+    (from, to, value) = abi.decode(token.beforeTransferData(), (address, address, uint256));
+    assertEq(from, address(this));
+    assertEq(to, address(0));
+    assertEq(value, 0.5e18);
+
+    token.transfer(owner, 0.5e18);
+
+    (from, to, value) = abi.decode(token.beforeTransferData(), (address, address, uint256));
+    assertEq(from, address(this));
+    assertEq(to, owner);
+    assertEq(value, 0.5e18);
+  }
+
+  function testAfterTransferHook() public {
+    token.mint(address(this), 1e18);
+
+    (address from, address to, uint256 value) = abi.decode(token.afterTransferData(), (address, address, uint256));
+    assertEq(from, address(0));
+    assertEq(to, address(this));
+    assertEq(value, 1e18);
+
+    token.burn(address(this), 0.5e18);
+
+    (from, to, value) = abi.decode(token.afterTransferData(), (address, address, uint256));
+    assertEq(from, address(this));
+    assertEq(to, address(0));
+    assertEq(value, 0.5e18);
+
+    token.transfer(owner, 0.5e18);
+
+    (from, to, value) = abi.decode(token.afterTransferData(), (address, address, uint256));
+    assertEq(from, address(this));
+    assertEq(to, owner);
+    assertEq(value, 0.5e18);
+  }
+
   function testPermit() public {
     uint256 privateKey = 0xBEEF;
     address signer = vm.addr(privateKey);

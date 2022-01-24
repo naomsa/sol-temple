@@ -221,6 +221,7 @@ abstract contract ERC721Upgradable {
     }
 
     emit Transfer(address(0), to_, tokenId_);
+    _afterTokenTransfer(address(0), to_, tokenId_);
   }
 
   /// @notice Destroys `tokenId`. The approval is cleared when the token is burned.
@@ -236,6 +237,7 @@ abstract contract ERC721Upgradable {
     _balanceOf[owner]--;
 
     emit Transfer(owner, address(0), tokenId_);
+    _afterTokenTransfer(owner, address(0), tokenId_);
   }
 
   /// @notice Transfers `tokenId_` from `from_` to `to`.
@@ -258,6 +260,7 @@ abstract contract ERC721Upgradable {
     }
 
     emit Transfer(from_, to_, tokenId_);
+    _afterTokenTransfer(from_, to_, tokenId_);
   }
 
   /// @notice Approve `to_` to operate on `tokenId_`
@@ -301,6 +304,13 @@ abstract contract ERC721Upgradable {
 
   /// @notice Hook that is called before any token transfer.
   function _beforeTokenTransfer(
+    address from_,
+    address to_,
+    uint256 tokenId_
+  ) internal virtual {}
+
+  /// @notice Hook that is called after any token transfer.
+  function _afterTokenTransfer(
     address from_,
     address to_,
     uint256 tokenId_
