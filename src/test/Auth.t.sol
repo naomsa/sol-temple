@@ -2,7 +2,7 @@
 pragma solidity >=0.8.0 <0.9.0;
 
 import "ds-test/test.sol";
-import "./vm.sol";
+import "./utils/vm.sol";
 import "./mocks/AuthMock.sol";
 
 contract AuthTest is DSTest {

@@ -2,7 +2,7 @@
 pragma solidity >=0.8.0 <0.9.0;
 
 import "ds-test/test.sol";
-import "./vm.sol";
+import "./utils/vm.sol";
 import "../utils/Proxy.sol";
 import "./mocks/ERC721UpgradableMock.sol";
 import "./mocks/ERC721ReceiverMock.sol";
