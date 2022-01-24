@@ -5,7 +5,7 @@ import "ds-test/test.sol";
 import "./vm.sol";
 import "./mocks/ERC20Mock.sol";
 
-contract ERC20Test is DSTest {
+contract TestERC20 is DSTest {
   Vm vm = Vm(0x7109709ECfa91a80626fF3989D68f67F5b1DD12D);
   ERC20Mock token;
 
@@ -16,7 +16,7 @@ contract ERC20Test is DSTest {
 
   function setUp() public {
     // Deploy mock(s)
-    token = new ERC20Mock("Token", "TKN", 18);
+    token = new ERC20Mock("Token", "TKN", 18, "1");
   }
 
   // should initialize with correct name, symbol and decimals
@@ -24,6 +24,7 @@ contract ERC20Test is DSTest {
     assertEq(token.name(), "Token");
     assertEq(token.symbol(), "TKN");
     assertEq(token.decimals(), 18);
+    assertEq(token.version(), "1");
   }
 
   // should mint tokens and update supply + balance

@@ -6,7 +6,7 @@ import "./vm.sol";
 import "../utils/Proxy.sol";
 import "./mocks/ERC20UpgradableMock.sol";
 
-contract ERC20UpgradableTest is DSTest {
+contract TestERC20Upgradable is DSTest {
   Vm vm = Vm(0x7109709ECfa91a80626fF3989D68f67F5b1DD12D);
   ERC20UpgradableMock implementation;
   Proxy proxy;
@@ -22,13 +22,14 @@ contract ERC20UpgradableTest is DSTest {
     implementation = new ERC20UpgradableMock();
     proxy = new Proxy(address(implementation));
     token = ERC20UpgradableMock(address(proxy));
-    token.initialize("Token", "TKN", 18);
+    token.initialize("Token", "TKN", 18, "1");
   }
 
   function testMetadata() public {
     assertEq(token.name(), "Token");
     assertEq(token.symbol(), "TKN");
     assertEq(token.decimals(), 18);
+    assertEq(token.version(), "1");
   }
 
   function testMint() public {
@@ -235,11 +236,9 @@ contract ERC20UpgradableTest is DSTest {
   function testSetImplementation() public {
     ERC20UpgradableMock newToken = new ERC20UpgradableMock();
     proxy.setImplementation(address(newToken));
-    token.initialize("Token2", "TKN2", 18);
+    token.initialize("Token", "TKN", 18, "2");
 
     assertEq(proxy.implementation(), address(newToken));
-    assertEq(token.name(), "Token2");
-    assertEq(token.symbol(), "TKN2");
-    assertEq(token.decimals(), 18);
+    assertEq(token.version(), "2");
   }
 }

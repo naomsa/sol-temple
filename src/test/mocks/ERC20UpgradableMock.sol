@@ -11,9 +11,10 @@ contract ERC20UpgradableMock is Upgradable, ERC20Upgradable {
   function initialize(
     string memory name,
     string memory symbol,
-    uint8 decimals
+    uint8 decimals,
+    string memory version
   ) external onlyOwner {
-    __ERC20_init(name, symbol, decimals);
+    __ERC20_init(name, symbol, decimals, version);
   }
 
   function mint(address to, uint256 value) external {

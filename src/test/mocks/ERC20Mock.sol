@@ -10,8 +10,9 @@ contract ERC20Mock is ERC20 {
   constructor(
     string memory name,
     string memory symbol,
-    uint8 decimals
-  ) ERC20(name, symbol, decimals) {}
+    uint8 decimals,
+    string memory version
+  ) ERC20(name, symbol, decimals, version) {}
 
   function mint(address to, uint256 value) external {
     _mint(to, value);

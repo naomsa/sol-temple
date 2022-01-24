@@ -27,6 +27,9 @@ abstract contract ERC20Upgradable {
   /// @notice See {ERC20-decimals}.
   uint8 public decimals;
 
+  /// @notice Used to hash the Domain Separator.
+  string public version;
+
   /// @notice See {ERC20-totalSupply}.
   uint256 public totalSupply;
   /// @notice See {ERC20-balanceOf}.
@@ -49,11 +52,13 @@ abstract contract ERC20Upgradable {
   function __ERC20_init(
     string memory name_,
     string memory symbol_,
-    uint8 decimals_
+    uint8 decimals_,
+    string memory version_
   ) internal {
     name = name_;
     symbol = symbol_;
     decimals = decimals_;
+    version = version_;
   }
 
   /// @notice See {ERC20-transfer}.
@@ -84,7 +89,7 @@ abstract contract ERC20Upgradable {
 
   /// @notice See {ERC2612-DOMAIN_SEPARATOR}.
   function DOMAIN_SEPARATOR() public view returns (bytes32) {
-    return _hashEIP712Domain(name, "1", block.chainid, address(this));
+    return _hashEIP712Domain(name, version, block.chainid, address(this));
   }
 
   /// @notice See {ERC2612-permit}.
