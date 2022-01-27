@@ -187,7 +187,7 @@ abstract contract ERC721Upgradable {
   function _isApprovedOrOwner(address spender_, uint256 tokenId_) internal view virtual returns (bool) {
     require(_exists(tokenId_), "ERC721: query for nonexistent token");
     address owner = _owners[tokenId_];
-    return (spender_ == owner || getApproved(tokenId_) == spender_ || _isApprovedForAll[owner][spender_]);
+    return (spender_ == owner || getApproved(tokenId_) == spender_ || isApprovedForAll(owner, spender_));
   }
 
   /// @notice Safely mints `tokenId_` and transfers it to `to`.
