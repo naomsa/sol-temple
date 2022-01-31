@@ -7,7 +7,8 @@
   "repository": "git@github.com:naomsa/sol-temple.git",
   "homepage": "https://github.com/naomsa/sol-temple",
   "files": [
-    "src/**/*.sol"
+    "src/**/*.sol",
+    "src/**/*.js"
   ],
   "scripts": {
     "format": "prettier --write src/**/*.sol"

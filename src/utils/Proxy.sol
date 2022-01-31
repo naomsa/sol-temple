@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 pragma solidity >=0.8.0 <0.9.0;
 
-import "./Auth.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 
 /**
  * @title Proxy
@@ -10,35 +10,35 @@ import "./Auth.sol";
  * @dev The implementaion MUST reserve the first two storage slots to the
  * `_owner` address and the `_implementation` address.
  */
-contract Proxy is Auth {
+contract Proxy is Ownable {
   /// @notice Emitted when a new implementation is set.
   event Upgraded(address indexed from, address indexed to);
 
   /// @notice Current implementation address.
   address private _implementation;
 
-  constructor(address implementation_) {
-    setImplementation(implementation_);
+  constructor(address newImplementation) {
+    setImplementation(newImplementation);
   }
 
   /// @notice Set the new implementation.
-  function setImplementation(address implementation_) public onlyOwner {
-    require(implementation_ != address(0), "Proxy: upgrading to the zero address");
-    require(implementation_ != _implementation, "Proxy: upgrading to the current implementation");
+  function setImplementation(address newImplementation) public onlyOwner {
+    require(newImplementation != address(0), "Proxy: upgrading to the zero address");
+    require(newImplementation != _implementation, "Proxy: upgrading to the current implementation");
 
     address oldImplementation = _implementation;
-    _implementation = implementation_;
+    _implementation = newImplementation;
 
-    emit Upgraded(oldImplementation, implementation_);
+    emit Upgraded(oldImplementation, newImplementation);
   }
 
   /// @notice See {EIP897-implementation}.
-  function implementation() public view returns (address) {
+  function implementation() external view returns (address) {
     return _implementation;
   }
 
   /// @notice See {EIP897-proxyType}.
-  function proxyType() public pure returns (uint256) {
+  function proxyType() external pure returns (uint256) {
     return 2;
   }
 
@@ -47,7 +47,6 @@ contract Proxy is Auth {
    * function in the contract matches the call data.
    */
   fallback() external payable {
-    _beforeFallback();
     _delegate(_implementation);
   }
 
@@ -56,12 +55,11 @@ contract Proxy is Auth {
    * function in the contract matches the call data.
    */
   receive() external payable {
-    _beforeFallback();
     _delegate(_implementation);
   }
 
-  /// @notice Delegate the current call to `implementation_`.
-  function _delegate(address implementation_) internal {
+  /// @notice Delegate the current call to `newImplementation`.
+  function _delegate(address newImplementation) internal {
     assembly {
       // Copy msg.data. We take full control of memory in this inline assembly
       // block because it will not return to Solidity code. We overwrite the
@@ -70,7 +68,7 @@ contract Proxy is Auth {
 
       // Call the implementation.
       // out and outsize are 0 because we don't know the size yet.
-      let result := delegatecall(gas(), implementation_, 0, calldatasize(), 0, 0)
+      let result := delegatecall(gas(), newImplementation, 0, calldatasize(), 0, 0)
 
       // Copy the returned data.
       returndatacopy(0, 0, returndatasize())
@@ -85,7 +83,4 @@ contract Proxy is Auth {
       }
     }
   }
-
-  /// @notice Hook that is called before any delegation.
-  function _beforeFallback() internal {}
 }
