@@ -1,24 +1,22 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 pragma solidity >=0.8.0 <0.9.0;
 
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/extensions/draft-IERC20Permit.sol";
+
 /**
  * @title ERC20 Upgradable
  * @author naomsa <https://twitter.com/naomsa666>
  * @notice A complete ERC20 implementation including EIP-2612 permit feature.
  * Inspired by Solmate's ERC20, aiming at efficiency.
  */
-abstract contract ERC20Upgradable {
+abstract contract ERC20Upgradable is IERC20, IERC20Permit {
   /*         _           _            */
   /*        ( )_        ( )_          */
   /*    ___ | ,_)   _ _ | ,_)   __    */
   /*  /',__)| |   /'_` )| |   /'__`\  */
   /*  \__, \| |_ ( (_| || |_ (  ___/  */
   /*  (____/`\__)`\__,_)`\__)`\____)  */
-
-  /// @notice See {ERC20-Transfer}.
-  event Transfer(address indexed from, address indexed to, uint256 value);
-  /// @notice See {ERC20-Approval}.
-  event Approval(address indexed owner, address indexed spender, uint256 value);
 
   /// @notice See {ERC20-name}.
   string public name;
@@ -118,6 +116,7 @@ abstract contract ERC20Upgradable {
         )
       )
     );
+
     address signer = ecrecover(digest, v_, r_, s_);
     require(signer != address(0) && signer == owner_, "ERC20: invalid signature");
 
@@ -140,8 +139,8 @@ abstract contract ERC20Upgradable {
     require(balanceOf[from_] >= value_, "ERC20: insufficient balance");
     _beforeTokenTransfer(from_, to_, value_);
 
-    balanceOf[from_] -= value_;
     unchecked {
+      balanceOf[from_] -= value_;
       balanceOf[to_] += value_;
     }
 
@@ -175,9 +174,10 @@ abstract contract ERC20Upgradable {
   /// @notice Internal burning logic.
   function _burn(address from_, uint256 value_) internal {
     _beforeTokenTransfer(from_, address(0), value_);
+    require(balanceOf[from_] >= value_, "ERC20: burn value exceeds balance");
 
-    balanceOf[from_] -= value_;
     unchecked {
+      balanceOf[from_] -= value_;
       totalSupply -= value_;
     }
 
@@ -194,7 +194,7 @@ abstract contract ERC20Upgradable {
     string memory version_,
     uint256 chainId_,
     address verifyingContract_
-  ) internal pure returns (bytes32) {
+  ) private pure returns (bytes32) {
     bytes32 result;
     assembly {
       // Calculate hashes of dynamic data
@@ -221,7 +221,7 @@ abstract contract ERC20Upgradable {
    * @notice EIP721 typed message hashing helper.
    * @dev Modified from https://github.com/0xProject/0x-monorepo/blob/development/contracts/utils/contracts/src/LibEIP712.sol
    */
-  function _hashEIP712Message(bytes32 domainSeparator_, bytes32 hash_) internal pure returns (bytes32) {
+  function _hashEIP712Message(bytes32 domainSeparator_, bytes32 hash_) private pure returns (bytes32) {
     bytes32 result;
     assembly {
       // Load free memory pointer
