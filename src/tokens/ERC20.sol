@@ -140,8 +140,8 @@ abstract contract ERC20 {
     require(balanceOf[from_] >= value_, "ERC20: insufficient balance");
     _beforeTokenTransfer(from_, to_, value_);
 
-    balanceOf[from_] -= value_;
     unchecked {
+      balanceOf[from_] -= value_;
       balanceOf[to_] += value_;
     }
 
