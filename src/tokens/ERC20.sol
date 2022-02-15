@@ -20,8 +20,10 @@ abstract contract ERC20 is IERC20 {
 
   /// @notice See {ERC20-name}.
   string public name;
+
   /// @notice See {ERC20-symbol}.
   string public symbol;
+
   /// @notice See {ERC20-decimals}.
   uint8 public immutable decimals;
 
@@ -30,8 +32,10 @@ abstract contract ERC20 is IERC20 {
 
   /// @notice See {ERC20-totalSupply}.
   uint256 public totalSupply;
+
   /// @notice See {ERC20-balanceOf}.
   mapping(address => uint256) public balanceOf;
+
   /// @notice See {ERC20-allowance}.
   mapping(address => mapping(address => uint256)) public allowance;
 

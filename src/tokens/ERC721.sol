@@ -1,13 +1,19 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 pragma solidity >=0.8.0 <0.9.0;
 
+import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
+import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
+import "@openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol";
+import "@openzeppelin/contracts/token/ERC721/extensions/IERC721Enumerable.sol";
+import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
+
 /**
  * @title ERC721
  * @author naomsa <https://twitter.com/naomsa666>
  * @notice A complete ERC721 implementation including metadata and enumerable
  * functions. Completely gas optimized and extensible.
  */
-abstract contract ERC721 {
+abstract contract ERC721 is IERC165, IERC721, IERC721Metadata, IERC721Enumerable {
   /*         _           _            */
   /*        ( )_        ( )_          */
   /*    ___ | ,_)   _ _ | ,_)   __    */
@@ -15,15 +21,9 @@ abstract contract ERC721 {
   /*  \__, \| |_ ( (_| || |_ (  ___/  */
   /*  (____/`\__)`\__,_)`\__)`\____)  */
 
-  /// @notice See {ERC721-Transfer}.
-  event Transfer(address indexed _from, address indexed _to, uint256 indexed _tokenId);
-  /// @notice See {ERC721-Approval}.
-  event Approval(address indexed _owner, address indexed _approved, uint256 indexed _tokenId);
-  /// @notice See {ERC721-ApprovalForAll}.
-  event ApprovalForAll(address indexed _owner, address indexed _operator, bool _approved);
-
   /// @notice See {ERC721Metadata-name}.
   string public name;
+
   /// @notice See {ERC721Metadata-symbol}.
   string public symbol;
 
@@ -32,10 +32,13 @@ abstract contract ERC721 {
 
   /// @notice Array of all owners.
   address[] private _owners;
+
   /// @notice Mapping of all balances.
   mapping(address => uint256) private _balanceOf;
+
   /// @notice Mapping from token Id to it's approved address.
   mapping(uint256 => address) private _tokenApprovals;
+
   /// @notice Mapping of approvals between owner and operator.
   mapping(address => mapping(address => bool)) private _isApprovedForAll;
 
@@ -151,9 +154,8 @@ abstract contract ERC721 {
   function walletOfOwner(address account_) public view returns (uint256[] memory) {
     uint256 balance = balanceOf(account_);
     uint256[] memory ids = new uint256[](balance);
-    for (uint256 i = 0; i < balance; i++) {
-      ids[i] = tokenOfOwnerByIndex(account_, i);
-    }
+
+    for (uint256 i = 0; i < balance; i++) ids[i] = tokenOfOwnerByIndex(account_, i);
     return ids;
   }
 
@@ -323,21 +325,12 @@ abstract contract ERC721 {
   /*               | |                  */
   /*               (_)                  */
 
-  /// @notice See {IERC165-supportsInterface}.
+  /// @notice See {ERC165-supportsInterface}.
   function supportsInterface(bytes4 interfaceId_) public view virtual returns (bool) {
     return
-      interfaceId_ == 0x80ac58cd || // ERC721
-      interfaceId_ == 0x5b5e139f || // ERC721Metadata
-      interfaceId_ == 0x780e9d63 || // ERC721Enumerable
-      interfaceId_ == 0x01ffc9a7; // ERC165
+      interfaceId_ == type(IERC721).interfaceId || // ERC721
+      interfaceId_ == type(IERC721Metadata).interfaceId || // ERC721Metadata
+      interfaceId_ == type(IERC721Enumerable).interfaceId || // ERC721Enumerable
+      interfaceId_ == type(IERC165).interfaceId; // ERC165
   }
-}
-
-interface IERC721Receiver {
-  function onERC721Received(
-    address operator,
-    address from,
-    uint256 tokenId,
-    bytes memory data
-  ) external returns (bytes4);
 }

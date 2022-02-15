@@ -1,13 +1,17 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 pragma solidity >=0.8.0 <0.9.0;
 
+import "@openzeppelin/contracts/token/ERC1155/IERC1155.sol";
+import "@openzeppelin/contracts/token/ERC1155/extensions/IERC1155MetadataURI.sol";
+import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
+
 /**
  * @title ERC1155
  * @author naomsa <https://twitter.com/naomsa666>
  * @notice A complete ERC1155 implementation including supply tracking and
  * enumerable functions. Completely gas optimized and extensible.
  */
-abstract contract ERC1155 {
+abstract contract ERC1155 is IERC165, IERC1155, IERC1155MetadataURI {
   /*         _           _            */
   /*        ( )_        ( )_          */
   /*    ___ | ,_)   _ _ | ,_)   __    */
@@ -15,31 +19,12 @@ abstract contract ERC1155 {
   /*  \__, \| |_ ( (_| || |_ (  ___/  */
   /*  (____/`\__)`\__,_)`\__)`\____)  */
 
-  /// @notice See {ERC1155-TransferSingle}.
-  event TransferSingle(
-    address indexed _operator,
-    address indexed _from,
-    address indexed _to,
-    uint256 _id,
-    uint256 _value
-  );
-  /// @notice See {ERC1155-TransferBatch}.
-  event TransferBatch(
-    address indexed _operator,
-    address indexed _from,
-    address indexed _to,
-    uint256[] _ids,
-    uint256[] _values
-  );
-  /// @notice See {ERC1155-ApprovalForAll}.
-  event ApprovalForAll(address indexed _owner, address indexed _operator, bool _approved);
-  /// @notice See {ERC1155-URI}.
-  event URI(string _value, uint256 indexed _id);
-
   /// @notice See {ERC1155-balanceOf}.
   mapping(address => mapping(uint256 => uint256)) public balanceOf;
+
   /// @notice See {ERC1155-isApprovedForAll}.
   mapping(address => mapping(address => bool)) public isApprovedForAll;
+
   /// @notice Tracker for tokens in circulation by Id.
   mapping(uint256 => uint256) public totalSupply;
 
@@ -65,10 +50,7 @@ abstract contract ERC1155 {
     require(accounts.length == ids.length, "ERC1155: accounts and ids length mismatch");
 
     uint256[] memory batchBalances = new uint256[](accounts.length);
-
-    for (uint256 i = 0; i < accounts.length; i++) {
-      batchBalances[i] = balanceOf[accounts[i]][ids[i]];
-    }
+    for (uint256 i = 0; i < accounts.length; i++) batchBalances[i] = balanceOf[accounts[i]][ids[i]];
 
     return batchBalances;
   }
@@ -161,8 +143,8 @@ abstract contract ERC1155 {
       require(balanceOf[from][ids[i]] >= amounts[i], "ERC1155: insufficient balance for transfer");
       unchecked {
         balanceOf[from][ids[i]] -= amounts[i];
+        balanceOf[to][ids[i]] += amounts[i];
       }
-      balanceOf[to][ids[i]] += amounts[i];
     }
 
     emit TransferBatch(msg.sender, from, to, ids, amounts);
@@ -356,12 +338,12 @@ abstract contract ERC1155 {
   /*               | |                  */
   /*               (_)                  */
 
-  /// @notice See {IERC165-supportsInterface}.
+  /// @notice See {ERC165-supportsInterface}.
   function supportsInterface(bytes4 interfaceId) public view virtual returns (bool) {
     return
-      interfaceId == 0xd9b67a26 || // ERC1155
-      interfaceId == 0x0e89341c || // ERC1155MetadataURI
-      interfaceId == 0x01ffc9a7; // ERC165
+      interfaceId == type(IERC1155).interfaceId || // ERC1155
+      interfaceId == type(IERC1155MetadataURI).interfaceId || // ERC1155MetadataURI
+      interfaceId == type(IERC165).interfaceId; // ERC165
   }
 }
 
