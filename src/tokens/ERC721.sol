@@ -7,12 +7,10 @@ import "@openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/IERC721Enumerable.sol";
 import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 
-/**
- * @title ERC721
- * @author naomsa <https://twitter.com/naomsa666>
- * @notice A complete ERC721 implementation including metadata and enumerable
- * functions. Completely gas optimized and extensible.
- */
+/// @title ERC721
+/// @author naomsa <https://twitter.com/naomsa666>
+/// @notice A complete ERC721 implementation including metadata and enumerable
+/// functions. Completely gas optimized and extensible.
 abstract contract ERC721 is IERC165, IERC721, IERC721Metadata, IERC721Enumerable {
   /*         _           _            */
   /*        ( )_        ( )_          */
@@ -31,7 +29,7 @@ abstract contract ERC721 is IERC165, IERC721, IERC721Metadata, IERC721Enumerable
   uint256 public totalSupply;
 
   /// @notice Array of all owners.
-  address[] private _owners;
+  mapping(uint256 => address) private _owners;
 
   /// @notice Mapping of all balances.
   mapping(address => uint256) private _balanceOf;
@@ -51,6 +49,7 @@ abstract contract ERC721 is IERC165, IERC721, IERC721Metadata, IERC721Enumerable
   /*              ( )_) |           */
   /*               \___/'           */
 
+  /// @dev Set token's name and symbol.
   constructor(string memory name_, string memory symbol_) {
     name = name_;
     symbol = symbol_;
@@ -135,7 +134,7 @@ abstract contract ERC721 is IERC165, IERC721, IERC721Metadata, IERC721Enumerable
   function tokenOfOwnerByIndex(address account_, uint256 index_) public view returns (uint256 tokenId) {
     require(index_ < balanceOf(account_), "ERC721Enumerable: Index out of bounds");
     uint256 count;
-    for (uint256 i; i < _owners.length; ++i) {
+    for (uint256 i; i < totalSupply; ++i) {
       if (account_ == _owners[i]) {
         if (count == index_) return i;
         else count++;
@@ -146,7 +145,7 @@ abstract contract ERC721 is IERC165, IERC721, IERC721Metadata, IERC721Enumerable
 
   /// @notice See {ERC721Enumerable.tokenByIndex}.
   function tokenByIndex(uint256 index_) public view virtual returns (uint256) {
-    require(index_ < _owners.length, "ERC721Enumerable: Index out of bounds");
+    require(index_ < totalSupply, "ERC721Enumerable: Index out of bounds");
     return index_;
   }
 
@@ -166,10 +165,8 @@ abstract contract ERC721 is IERC165, IERC721, IERC721Metadata, IERC721Enumerable
   /*  | || ( ) || |_ (  ___/| |   | ( ) |( (_| | | |  */
   /*  (_)(_) (_)`\__)`\____)(_)   (_) (_)`\__,_)(___) */
 
-  /**
-   * @notice Safely transfers `tokenId_` token from `from_` to `to`, checking first that contract recipients
-   * are aware of the ERC721 protocol to prevent tokens from being forever locked.
-   */
+  /// @notice Safely transfers `tokenId_` token from `from_` to `to`, checking first that contract recipients
+  /// are aware of the ERC721 protocol to prevent tokens from being forever locked.
   function _safeTransfer(
     address from_,
     address to_,
@@ -182,7 +179,7 @@ abstract contract ERC721 is IERC165, IERC721, IERC721Metadata, IERC721Enumerable
 
   /// @notice Returns whether `tokenId_` exists.
   function _exists(uint256 tokenId_) internal view virtual returns (bool) {
-    return tokenId_ < _owners.length && _owners[tokenId_] != address(0);
+    return tokenId_ < totalSupply && _owners[tokenId_] != address(0);
   }
 
   /// @notice Returns whether `spender_` is allowed to manage `tokenId`.
@@ -197,10 +194,8 @@ abstract contract ERC721 is IERC165, IERC721, IERC721Metadata, IERC721Enumerable
     _safeMint(to_, tokenId_, "");
   }
 
-  /**
-   * @notice Same as {_safeMint}, but with an additional `data_` parameter which is
-   * forwarded in {ERC721Receiver-onERC721Received} to contract recipients.
-   */
+  /// @notice Same as {_safeMint}, but with an additional `data_` parameter which is
+  /// forwarded in {ERC721Receiver-onERC721Received} to contract recipients.
   function _safeMint(
     address to_,
     uint256 tokenId_,
@@ -216,7 +211,7 @@ abstract contract ERC721 is IERC165, IERC721, IERC721Metadata, IERC721Enumerable
 
     _beforeTokenTransfer(address(0), to_, tokenId_);
 
-    _owners.push(to_);
+    _owners[tokenId_] = to_;
     totalSupply++;
     unchecked {
       _balanceOf[to_]++;
@@ -234,9 +229,10 @@ abstract contract ERC721 is IERC165, IERC721, IERC721Metadata, IERC721Enumerable
 
     // Clear approvals
     _approve(address(0), tokenId_);
-    delete _owners[tokenId_];
+
     totalSupply--;
     _balanceOf[owner]--;
+    delete _owners[tokenId_];
 
     emit Transfer(owner, address(0), tokenId_);
     _afterTokenTransfer(owner, address(0), tokenId_);
