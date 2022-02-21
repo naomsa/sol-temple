@@ -11,6 +11,7 @@
     "src/**/*.js"
   ],
   "scripts": {
+    "postinstall": "forge install",
     "format": "prettier --write src/**/*.sol"
   },
   "devDependencies": {
